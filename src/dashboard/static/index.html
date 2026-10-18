@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SecureNav-NEXUS // Ops</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>body{background:#05080f;color:#c8f7ff;font-family:ui-monospace,Menlo,monospace}
+.card{background:#0a1220;border:1px solid #12324a;border-radius:.75rem;padding:1rem}
+.glow{text-shadow:0 0 8px #00e5ff}canvas{width:100%;height:140px}</style>
+</head>
+<body class="p-4 max-w-6xl mx-auto">
+<header class="flex flex-wrap items-center justify-between gap-2 mb-4">
+  <h1 class="text-xl glow">SECURENAV-NEXUS <span class="text-cyan-600">// OPS</span></h1>
+  <div class="flex items-center gap-2 text-xs"><span id="link" class="px-2 py-1 rounded bg-red-900">OFFLINE</span>
+  <span id="estop" class="px-2 py-1 rounded bg-green-900">E-STOP: RELEASED</span></div>
+</header>
+<div class="card mb-4 flex flex-wrap gap-2 items-center text-sm">
+  <input id="tok" type="password" placeholder="dashboard token" class="bg-black border border-cyan-900 rounded px-2 py-1 flex-1 min-w-[10rem]">
+  <button onclick="connect()" class="px-3 py-1 bg-cyan-800 rounded">Connect</button>
+  <button onclick="override(true)" class="px-3 py-1 bg-red-700 rounded">ENGAGE E-STOP</button>
+  <button onclick="override(false)" class="px-3 py-1 bg-emerald-700 rounded">Release</button>
+</div>
+<div class="grid md:grid-cols-3 gap-4 mb-4">
+  <div class="card"><div class="text-xs text-cyan-600">ANOMALY SCORE</div><canvas id="c_score"></canvas></div>
+  <div class="card"><div class="text-xs text-cyan-600">/cmd_vel RATE (Hz)</div><canvas id="c_cmd"></canvas></div>
+  <div class="card"><div class="text-xs text-cyan-600">CPU %</div><canvas id="c_cpu"></canvas></div>
+</div>
+<div class="grid md:grid-cols-2 gap-4">
+  <div class="card"><div class="text-xs text-cyan-600 mb-2">SPATIAL CONTEXT (odom/detections)</div><canvas id="c_map" style="height:260px"></canvas></div>
+  <div class="card"><div class="text-xs text-cyan-600 mb-2">THREAT LOG</div><ul id="log" class="text-xs space-y-1 max-h-64 overflow-auto"></ul></div>
+</div>
+<script>
+const series={score:[],cmd:[],cpu:[]};let ws,tok="";
+function draw(id,data,color,max){const c=document.getElementById(id),x=c.getContext('2d');c.width=c.clientWidth;c.height=c.clientHeight;x.clearRect(0,0,c.width,c.height);
+ const m=max||Math.max(1,...data);x.strokeStyle=color;x.beginPath();data.forEach((v,i)=>{const px=i/(Math.max(data.length-1,1))*c.width,py=c.height-(v/m)*(c.height-6)-3;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();}
+function render(){draw('c_score',series.score,'#00e5ff');draw('c_cmd',series.cmd,'#ffd166');draw('c_cpu',series.cpu,'#9b8cff',100);}
+function map(){const c=document.getElementById('c_map'),x=c.getContext('2d');c.width=c.clientWidth;c.height=c.clientHeight;x.strokeStyle='#12324a';
+ for(let i=0;i<c.width;i+=40){x.beginPath();x.moveTo(i,0);x.lineTo(i,c.height);x.stroke()}for(let j=0;j<c.height;j+=40){x.beginPath();x.moveTo(0,j);x.lineTo(c.width,j);x.stroke()}
+ x.fillStyle='#00e5ff';x.beginPath();x.arc(c.width/2,c.height/2,6,0,7);x.fill();}
+function push(k,v){series[k].push(v);if(series[k].length>120)series[k].shift()}
+function addLog(t){const li=document.createElement('li');const sev=t.severity||'info';
+ li.className={critical:'text-red-400',high:'text-orange-400',medium:'text-yellow-300'}[sev]||'text-cyan-300';
+ li.textContent=`${new Date((t.ts||Date.now()/1e3)*1e3).toLocaleTimeString()} [${sev}] ${(t.reasons||[t.type]).join(' | ')}`;
+ const ul=document.getElementById('log');ul.prepend(li);while(ul.children.length>100)ul.lastChild.remove();}
+function setEstop(on){const e=document.getElementById('estop');e.textContent='E-STOP: '+(on?'ENGAGED':'RELEASED');e.className='px-2 py-1 rounded '+(on?'bg-red-700 animate-pulse':'bg-green-900')}
+function connect(){tok=document.getElementById('tok').value;ws&&ws.close();
+ ws=new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/ws/clients?token=${encodeURIComponent(tok)}`);
+ ws.onopen=()=>{const l=document.getElementById('link');l.textContent='LIVE';l.className='px-2 py-1 rounded bg-emerald-800'};
+ ws.onclose=()=>{const l=document.getElementById('link');l.textContent='OFFLINE';l.className='px-2 py-1 rounded bg-red-900'};
+ ws.onmessage=e=>{const m=JSON.parse(e.data);
+  if(m.kind==='snapshot'){(m.series||[]).forEach(s=>{push('score',s.score);push('cmd',s.cmd_vel_rate);push('cpu',s.cpu)});(m.threats||[]).reverse().forEach(addLog)}
+  if(m.kind==='telemetry'){push('score',m.score||0);push('cmd',m.features['/cmd_vel_rate']||0);push('cpu',m.features.cpu||0);setEstop(!!m.estop)}
+  if(m.kind==='threat')addLog(m);render()}}
+async function override(on){const r=await fetch('/api/override',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({estop:on,reason:on?'operator e-stop':'operator release'})});if(!r.ok)alert('override failed: '+r.status)}
+map();addEventListener('resize',()=>{map();render()});
+</script></body></html>

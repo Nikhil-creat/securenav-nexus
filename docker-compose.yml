@@ -1,0 +1,124 @@
+# SecureNav-NEXUS Ultimate - edge orchestration
+# Usage: ./scripts/setup_sros2.sh && docker compose up --build
+x-ros-common: &ros-common
+  networks: [nexus-net]
+  environment: &ros-env
+    ROS_DOMAIN_ID: "42"
+    ROS_SECURITY_KEYSTORE: /keystore
+    RMW_IMPLEMENTATION: rmw_fastrtps_cpp
+  volumes:
+    - ./keystore:/keystore:ro
+  restart: unless-stopped
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+
+x-gpu: &gpu
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
+
+services:
+  ros2-core-node:
+    <<: *ros-common
+    build: { context: ., dockerfile: docker/Dockerfile, target: core }
+    environment: { <<: *ros-env, NEXUS_ENCLAVE: /nexus/nav2 }
+    # Host networking is needed for DDS multicast on real hardware; use a discovery server in production.
+    healthcheck:
+      test: ["CMD-SHELL", "source /opt/ros/iron/setup.bash && ros2 node list | grep -q controller_server"]
+      interval: 15s
+      retries: 5
+
+  vision-perception-node:
+    <<: [*ros-common, *gpu]
+    build: { context: ., dockerfile: docker/Dockerfile, target: vision }
+    environment:
+      <<: *ros-env
+      NEXUS_ENCLAVE: /nexus/vision
+      NEXUS_MODEL_DIR: /models
+      NEXUS_BACKEND: auto   # auto | tensorrt | onnx | torch
+    volumes:
+      - ./keystore:/keystore:ro
+      - nexus-models:/models
+    depends_on: [ros2-core-node]
+
+  agentic-rag-core:
+    <<: *ros-common
+    build: { context: ., dockerfile: docker/Dockerfile, target: brain }
+    environment:
+      <<: *ros-env
+      NEXUS_ENCLAVE: /nexus/brain
+      QDRANT_URL: http://qdrant:6333
+      REDIS_URL: redis://redis:6379/0
+      LLM_ENDPOINT: ${LLM_ENDPOINT:-}      # optional OpenAI-compatible local endpoint (vLLM/Ollama)
+      LLM_MODEL: ${LLM_MODEL:-llama3}
+    depends_on: [qdrant, redis, ros2-core-node]
+
+  qdrant:
+    image: qdrant/qdrant:v1.8.4
+    networks: [nexus-net]
+    volumes: [qdrant-data:/qdrant/storage]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.2-alpine
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1"]
+    networks: [nexus-net]
+    volumes: [redis-data:/data]
+    restart: unless-stopped
+
+  sec-ids-guardian:
+    <<: *ros-common
+    build: { context: ., dockerfile: docker/Dockerfile, target: ids }
+    environment:
+      <<: *ros-env
+      NEXUS_ENCLAVE: /nexus/ids
+      DASHBOARD_URL: ws://dashboard:8080/ws/ingest
+      HSM_SOCKET: /run/nexus/hsm.sock
+    # eBPF needs elevated capabilities; scoped as narrowly as the kernel allows.
+    read_only: false
+    cap_drop: []
+    cap_add: [BPF, PERFMON, SYS_ADMIN, SYS_RESOURCE]
+    pid: host
+    volumes:
+      - ./keystore:/keystore:ro
+      - /sys/kernel/debug:/sys/kernel/debug:ro
+      - nexus-ipc:/run/nexus
+      - ./sim:/opt/nexus/sim:ro   # fault-injection harness (test benches only)
+    depends_on: [hsm-emulator-node, dashboard]
+
+  hsm-emulator-node:
+    <<: *ros-common
+    build: { context: ., dockerfile: docker/Dockerfile, target: hsm }
+    environment: { <<: *ros-env, NEXUS_ENCLAVE: /nexus/hsm, HSM_SOCKET: /run/nexus/hsm.sock, HSM_PIN_FILE: /run/secrets/hsm_pin }
+    volumes:
+      - ./keystore:/keystore:ro
+      - nexus-ipc:/run/nexus
+      - hsm-vault:/vault
+    secrets: [hsm_pin]
+
+  dashboard:
+    build: { context: ., dockerfile: docker/Dockerfile, target: dashboard }
+    networks: [nexus-net]
+    ports: ["127.0.0.1:8080:8080"]
+    environment:
+      DASHBOARD_TOKEN_FILE: /run/secrets/dashboard_token
+      GROQ_API_KEY_FILE: /run/secrets/groq_api_key   # optional; empty file => offline assistant
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+    secrets: [dashboard_token, groq_api_key]
+    restart: unless-stopped
+
+networks:
+  nexus-net: { driver: bridge, internal: false }
+
+volumes: { qdrant-data: {}, redis-data: {}, nexus-models: {}, nexus-ipc: {}, hsm-vault: {} }
+
+secrets:
+  hsm_pin: { file: ./secrets/hsm_pin.txt }
+  dashboard_token: { file: ./secrets/dashboard_token.txt }
+  groq_api_key: { file: ./secrets/groq_api_key.txt }

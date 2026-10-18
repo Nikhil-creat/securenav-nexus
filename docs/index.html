@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#04070d">
+<title>SecureNav-NEXUS Ultimate | Nikhil Chary Sriramoju</title>
+<meta name="description" content="Zero-trust autonomous robot platform with edge AI, agentic RAG, ML intrusion detection, post-quantum hooks and a Groq-powered AI copilot. Live in-browser digital twin.">
+<style>
+:root{--bg:#04070d;--card:#0a121f;--line:#143049;--cy:#00e5ff;--vi:#8b7bff;--gr:#2dffa0;--rd:#ff4d6d;--or:#ffb347;--tx:#d4f4ff;--mut:#6f9bb3}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,#0d2540 0,transparent 60%),var(--bg);color:var(--tx);font:15px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding-bottom:env(safe-area-inset-bottom)}
+a{color:var(--cy);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1100px;margin:0 auto;padding:0 14px}
+nav{position:sticky;top:0;z-index:20;background:#04070dcc;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+nav .wrap{display:flex;gap:14px;align-items:center;overflow-x:auto;white-space:nowrap;padding-top:10px;padding-bottom:10px;font-size:13px}
+nav b{color:var(--cy);text-shadow:0 0 10px var(--cy)}
+section{padding:34px 0 6px}h2{font-size:12px;letter-spacing:.25em;color:var(--cy);margin:0 0 14px;text-transform:uppercase}
+h2:before{content:"// ";color:var(--vi)}
+.hero{padding-top:30px}.hero h1{font-size:clamp(26px,6vw,48px);margin:0;line-height:1.1;background:linear-gradient(90deg,var(--cy),var(--vi),var(--gr));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--mut);max-width:720px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{border:1px solid var(--line);background:#0a1526;border-radius:99px;padding:4px 12px;font-size:12px}
+.btn{display:inline-block;border:1px solid var(--cy);color:var(--cy);background:transparent;border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}
+.btn:hover{background:#00e5ff22;text-decoration:none}.btn.red{border-color:var(--rd);color:var(--rd)}.btn.grn{border-color:var(--gr);color:var(--gr)}.btn.vi{border-color:var(--vi);color:var(--vi)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}.g3{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h3{margin:0 0 6px;font-size:14px;color:var(--tx)}.mut{color:var(--mut);font-size:13px}
+canvas{width:100%;display:block;border-radius:8px;background:#050b14}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
+.m{background:#08111d;border:1px solid var(--line);border-radius:8px;padding:8px}.m small{display:block;color:var(--mut);font-size:11px}.m span{font-size:16px}
+.ok{color:var(--gr)}.warn{color:var(--or)}.bad{color:var(--rd)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+#log{max-height:260px;overflow:auto;font-size:12px;display:grid;gap:6px}
+#log div{border-left:3px solid var(--cy);padding:2px 8px;background:#08111d;border-radius:4px}
+#log .critical{border-color:var(--rd)}#log .high{border-color:var(--or)}#log .info{border-color:var(--vi)}
+.nodes{display:flex;flex-wrap:wrap;gap:6px}.node{font-size:11px;border:1px solid var(--line);padding:3px 8px;border-radius:6px}
+.node.ok{border-color:var(--gr)}.node.warn{border-color:var(--or);color:var(--or)}.node.bad{border-color:var(--rd);color:var(--rd)}
+#chat{display:flex;flex-direction:column;height:480px}
+#msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
+.msg{padding:8px 11px;border-radius:10px;max-width:92%;white-space:pre-wrap;word-break:break-word;font-size:13px}
+.msg.u{align-self:flex-end;background:#12335a}.msg.a{align-self:flex-start;background:#0d1d33;border:1px solid var(--line)}
+.msg .tag{display:block;font-size:10px;color:var(--vi);margin-top:4px}
+.inp{display:flex;gap:6px;margin-top:8px}
+input,select{background:#050b14;color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:9px;font:inherit;font-size:14px;min-width:0}
+.inp input{flex:1}
+details{margin-bottom:8px}summary{cursor:pointer;color:var(--vi);font-size:13px}
+.cert{font-size:12px;padding:3px 0;border-bottom:1px dashed #12324a}
+.tag2{font-size:10px;border:1px solid var(--vi);color:var(--vi);border-radius:5px;padding:0 5px;margin-left:6px}
+pre{background:#050b14;border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;font-size:11.5px}
+footer{padding:30px 0 40px;color:var(--mut);font-size:12px;text-align:center}
+@media(prefers-reduced-motion:no-preference){.pulse{animation:p 1.2s infinite}@keyframes p{50%{opacity:.4}}}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><b>NEXUS//</b><a href="#twin">Digital Twin</a><a href="#ai">AI Copilot</a><a href="#rag">RAG Search</a><a href="#arch">Architecture</a><a href="#creds">Credentials</a><a href="#proj">Projects</a></div></nav>
+
+<div class="wrap">
+<section class="hero">
+  <div class="chip" style="display:inline-block">ROS 2 · SROS2 · Edge CNN+ViT · LangGraph RAG · eBPF IDS · Post-Quantum ready</div>
+  <h1>SecureNav-NEXUS Ultimate</h1>
+  <p>A zero-trust autonomous mobile robot / drone platform that detects cyber-physical attacks in real time, fails safe, revokes compromised identities and explains itself through a Groq-powered AI copilot. Everything below runs live in your browser.</p>
+  <div class="chips" id="statChips"></div>
+  <div class="row">
+    <a class="btn" href="#twin">Launch live twin</a>
+    <a class="btn vi" href="#ai">Talk to NEXUS-AI</a>
+    <a class="btn grn" id="ghLink" target="_blank" rel="noopener">GitHub</a>
+    <a class="btn" id="liLink" target="_blank" rel="noopener">LinkedIn</a>
+    <a class="btn" id="mailLink">Email</a>
+  </div>
+  <p class="mut">Built by <b id="whoami"></b>.</p>
+</section>
+
+<section id="twin">
+  <h2>Live digital twin &amp; attack lab</h2>
+  <div class="grid g2" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+    <div class="card">
+      <canvas id="map"></canvas>
+      <div class="metrics">
+        <div class="m"><small>ANOMALY SCORE</small><span id="mScore">0.00</span></div>
+        <div class="m"><small>/cmd_vel Hz</small><span id="mCmd">0</span></div>
+        <div class="m"><small>SPEED CAP m/s</small><span id="mCap">1.0</span></div>
+        <div class="m"><small>E-STOP</small><span id="mStop" class="ok">RELEASED</span></div>
+        <div class="m"><small>PROFILE</small><span id="mProf">nominal</span></div>
+        <div class="m"><small>FUSION cam/lidar/odom</small><span id="mFus">.4/.4/.2</span></div>
+      </div>
+      <div class="nodes" id="nodes" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <h3>Adversarial attack lab <span class="tag2" id="ready">learning baseline…</span></h3>
+      <div class="mut">The in-browser IDS learns a clean baseline for ~12 s, then you can attack the robot. Mirrors the Python IDS: z-score + hard rules, e-stop first, HSM revocation, self-healing playbooks.</div>
+      <div class="row">
+        <button class="btn red atk" data-a="dos" disabled>DoS flood</button>
+        <button class="btn red atk" data-a="rogue" disabled>Rogue /cmd_vel</button>
+        <button class="btn red atk" data-a="spoof" disabled>Camera spoof</button>
+        <button class="btn red atk" data-a="gps" disabled>GPS denial</button>
+      </div>
+      <div class="row">
+        <button class="btn grn" id="release">Release e-stop (operator)</button>
+        <button class="btn" id="estopBtn">Engage e-stop</button>
+      </div>
+      <canvas id="chart" style="height:110px"></canvas>
+      <h3 style="margin-top:10px">Threat &amp; response log</h3>
+      <div id="log"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Mission planner (natural language → waypoints)</h3>
+    <div class="inp"><input id="mission" value="go to (25,4) then patrol south 8 m then (5,14) at 0.8 m/s" aria-label="mission directive"><button class="btn" id="planBtn">Plan</button></div>
+  </div>
+</section>
+
+<section id="ai">
+  <h2>NEXUS-AI copilot · Groq</h2>
+  <div class="grid g2" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+    <div class="card" id="chat">
+      <div id="msgs"></div>
+      <div class="row" id="quick"></div>
+      <div class="inp"><button class="btn" id="mic" title="Voice input">🎙</button><input id="chatIn" placeholder="Ask NEXUS-AI or give a command…" aria-label="chat input"><button class="btn vi" id="send">Send</button></div>
+    </div>
+    <div class="card">
+      <h3>Connect your free Groq key</h3>
+      <p class="mut">Get a free key at <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>. It is stored only in this browser (localStorage) and sent only to api.groq.com. Never commit it to GitHub. Use a key you can revoke.</p>
+      <div class="inp"><input id="key" type="password" placeholder="gsk_..." autocomplete="off"><button class="btn grn" id="saveKey">Save</button><button class="btn" id="clearKey">Clear</button></div>
+      <div class="inp"><select id="model"><option>llama-3.3-70b-versatile</option><option>llama-3.1-8b-instant</option></select></div>
+      <div class="row"><label class="mut"><input type="checkbox" id="tts"> speak replies</label><span class="mut" id="aiMode">mode: offline</span></div>
+      <p class="mut">Agentic tool use: the model can read live telemetry, list threats, search the RAG knowledge base, plan missions, launch simulated attacks and engage the e-stop. It can never release the e-stop; that stays a human action. Without a key an offline rule-based copilot answers.</p>
+    </div>
+  </div>
+</section>
+
+<section id="rag">
+  <h2>Threat-knowledge RAG search (in-browser vector search)</h2>
+  <div class="card"><div class="inp"><input id="q" placeholder="e.g. rogue node publishing cmd_vel" aria-label="knowledge query"><button class="btn" id="qBtn">Search</button></div><div id="hits" style="margin-top:10px"></div>
+  <p class="mut">Hashed-embedding cosine search over MITRE ATT&amp;CK for ICS, NIST 800-82, ISO/SAE 21434 summaries and playbooks. The production stack uses Qdrant for the same flow.</p></div>
+</section>
+
+<section id="arch">
+  <h2>Architecture</h2>
+<pre>
+ sensors / Gazebo ─► ros2-core (Nav2 + SROS2) ◄══ DDS ENCRYPT ══► sec-ids-guardian (IsoForest+AE+rules+eBPF)
+   camera · lidar         │ /cmd_vel                                   │ /sys/e_stop · /security/alerts
+        │                 ▼                                            ▼
+        └─► vision-perception (CNN+ViT, TRT/ONNX) ─► /perception/*   hsm-emulator (Ed25519 + Dilithium3)
+                                │                                      ▲ revoke
+                         agentic-rag-core (LangGraph: Planner · Audit · Self-Heal) ─ Qdrant · Redis
+                                │
+                       dashboard (FastAPI WS) ─ NEXUS-AI copilot (Groq tool-calling)
+</pre>
+  <div class="grid g3">
+    <div class="card"><h3>Zero-trust</h3><div class="mut">SROS2 enclaves, signed governance, topic ACLs, encrypted discovery, least-privilege publishers.</div></div>
+    <div class="card"><h3>Edge AI</h3><div class="mut">PyTorch CNN+ViT for segmentation, depth and spoof detection; ONNX / TensorRT FP16 &amp; INT8 export for Jetson Orin.</div></div>
+    <div class="card"><h3>Agentic RAG</h3><div class="mut">LangGraph agents triage with a Qdrant knowledge base; LLM may only escalate severity, never downgrade rule-based critical.</div></div>
+    <div class="card"><h3>Intrusion defense</h3><div class="mut">Isolation Forest + autoencoder + hard rules + eBPF syscall audit; e-stop before analysis.</div></div>
+    <div class="card"><h3>Post-quantum ready</h3><div class="mut">Hybrid Ed25519 + CRYSTALS-Dilithium3 signing hook, signed certificate revocations.</div></div>
+    <div class="card"><h3>Human in the loop</h3><div class="mut">Operator override console; the AI can stop the robot but only a human can release it.</div></div>
+  </div>
+</section>
+
+<section id="creds">
+  <h2>Credentials</h2>
+  <div class="card"><h3 id="credName"></h3><div class="mut" id="credRole"></div><div id="certs" style="margin-top:10px"></div></div>
+</section>
+
+<section id="proj">
+  <h2>More projects by the author</h2>
+  <div class="grid g3" id="projects"></div>
+</section>
+<footer>SecureNav-NEXUS Ultimate · simulation demo, not a certified safety system · © <span id="yr"></span> <span id="foot"></span></footer>
+</div>
+
+<script>
+"use strict";
+/* ============================== profile & credentials data ============================== */
+const ME={name:"Nikhil Chary Sriramoju",role:"BTech CSE (final year) · AI security, agentic systems & cyber-physical engineering",
+ github:"https://github.com/Nikhil-creat",linkedin:"https://in.linkedin.com/in/nikhil-chary-sriramoju-95041b38a",email:"sriramojunikhil66@gmail.com"};
+const CERTS={
+ "Forage job simulations":["Software Engineer at a Start Up (Jul 2026)","Technology Consulting, PwC (Jul 2026)","Cyber Security Consulting, PwC (Jul 2026)","Automation AI Accelerator: Co-pilot to Autonomous Agent, Datacom (Jul 2026)","Cyber Security Global Virtual Internship, Clifford Chance (Jul 2026)","Cyber Security Operations, Datacom (Jul 2026)","Data Science, British Airways (Jul 2026)","Data and Technology Transactions, Latham & Watkins (Jul 2026)","Data Analytics, Deloitte (Jun 2026)","Technology, Deloitte (Jul 2026)"],
+ "NASSCOM / Skill India Digital Hub":["IT Forensic Analyst (Jul 2026)","Product Manager, Web & Mobile (Jul 2026)","Cloud Infrastructure Analyst (Jun 2026)","Analyst Endpoint Security, Cybersecurity (Jun 2026)","Blockchain Architect (Jun 2026)"],
+ "Reliance Foundation Skilling Academy":["Industry 4.0 Robotics Systems, 90 hrs (Jul 2026)","IoT Security Specialist Certificate Programme (Jun 2026)","AI-Machine Learning Engineer Foundation Course (Jun 2026)"],
+ "NIELIT / Skill India":["Yuva AI for All, Skill Competency Certificate, NSQF Level 2 (Jun 2026)"],
+ "Internships & other":["Data Analytics internship, Thiranex (Jul-Aug 2026)","Mastering Power BI, PHN Technology (Jul 2026)","How to Get a Job, UNICEF Yuwaah (Jun 2026)"]};
+const PROJECTS=[["BastionMesh AI","Multi-agent mesh: CNN vision, CRAG, MCP tools, Raft-style consensus"],["APEX-AI","Agentic multimodal assistant: Groq, LangGraph, GraphRAG, 6 Docker services"],["VigilAI Engine Mesh","vLLM + agentic RAG + CNN vision + QoS gateway + Prometheus/Grafana"],["EcoGrid-AI","Self-healing decentralized microgrid sentinel"],["PharmAi Vision","Pill identifier + agentic assistant (CNN+ViT, OCR, GraphRAG)"],["StreamGuard","Real-time fraud pipeline: Kafka, Airflow, dbt, Delta Lake"],["OptiMarket X","Multi-agent AI commerce mesh for D2C brands"],["LLMOps Nexus","Semantic caching layer for LLM APIs"],["Raft KV Store","Distributed key-value store with AI anomaly detection"],["AD-CSF","Autonomous distributed cognitive security fabric (PQC + zero trust)"],["Aether Screenshot Studio","CNN + RAG self-healing screenshot editor"],["Medha","Agentic looping assistant, coder and researcher"]];
+const $=s=>document.querySelector(s), el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e};
+(function profile(){
+ $("#ghLink").href=ME.github;$("#liLink").href=ME.linkedin;$("#mailLink").href="mailto:"+ME.email;$("#whoami").textContent=ME.name;
+ $("#credName").textContent=ME.name;$("#credRole").textContent=ME.role;$("#foot").textContent=ME.name;$("#yr").textContent=new Date().getFullYear();
+ let total=0;const box=$("#certs");
+ for(const [grp,items] of Object.entries(CERTS)){total+=items.length;const d=document.createElement("details");d.open=grp.startsWith("Forage");d.appendChild(el("summary","",grp+" ("+items.length+")"));items.forEach(i=>d.appendChild(el("div","cert",i)));box.appendChild(d)}
+ const sc=$("#statChips");[total+" certifications & simulations",PROJECTS.length+"+ AI/security projects","10 integrated platform layers","Groq-powered copilot"].forEach(t=>sc.appendChild(el("span","chip",t)));
+ const pg=$("#projects");PROJECTS.forEach(([n,d])=>{const c=el("a","card");c.href=ME.github+"?tab=repositories";c.target="_blank";c.rel="noopener";c.appendChild(el("h3","",n));c.appendChild(el("div","mut",d));pg.appendChild(c)});
+})();
+
+/* ============================== world + physics ============================== */
+const W=30,H=18,TS=2;
+const OBST=[{x:10,y:6,r:1.6},{x:18,y:12,r:2},{x:23,y:5,r:1.3},{x:7,y:13,r:1.2}];
+const S={robot:{x:3,y:9,th:0},wps:[{x:27,y:9},{x:15,y:3},{x:4,y:15},{x:3,y:9}],wi:0,loop:true,estop:false,cap:1.0,fusion:{cam:.4,lidar:.4,odom:.2},profile:"nominal",
+ attacks:{},revoked:[],threats:[],series:{score:[],cmd:[],cpu:[]},ready:false,ticks:0,base:[],mean:null,std:null,lastThreat:0,cool:{},trail:[],rays:[],ghost:null,drift:{x:0,y:0},score:0,cmdHz:0,mode:"offline"};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), gauss=()=>{let u=0;for(let i=0;i<6;i++)u+=Math.random();return (u-3)/Math.sqrt(.5)};
+function castRay(x,y,a,maxR){const dx=Math.cos(a),dy=Math.sin(a);let best=maxR;
+ for(const o of OBST){const px=x-o.x,py=y-o.y,b=dx*px+dy*py,c=px*px+py*py-o.r*o.r,d=b*b-c;if(d>=0){const t=-b-Math.sqrt(d);if(t>0&&t<best)best=t}}
+ const tw=[dx>1e-6?(W-x)/dx:1e9,dx<-1e-6?-x/dx:1e9,dy>1e-6?(H-y)/dy:1e9,dy<-1e-6?-y/dy:1e9].filter(t=>t>0);best=Math.min(best,...tw);return best}
+function physics(dt){const r=S.robot;S.rays=[];let front=9,left=9,right=9;
+ for(let i=0;i<48;i++){const a=r.th+(i/48)*Math.PI*2,d=castRay(r.x,r.y,a,7);S.rays.push([a,d]);let rel=((a-r.th+Math.PI*3)%(Math.PI*2))-Math.PI;
+  if(Math.abs(rel)<.5)front=Math.min(front,d);if(rel>.3&&rel<1.4)left=Math.min(left,d);if(rel<-.3&&rel>-1.4)right=Math.min(right,d)}
+ if(S.estop){return}
+ const wp=S.wps[S.wi];if(!wp)return;const dxw=wp.x-r.x,dyw=wp.y-r.y,dist=Math.hypot(dxw,dyw);
+ if(dist<.5){if(S.wi<S.wps.length-1)S.wi++;else if(S.loop)S.wi=0;return}
+ let err=Math.atan2(dyw,dxw)-r.th;err=Math.atan2(Math.sin(err),Math.cos(err));
+ let turn=clamp(err*2.5,-1.8,1.8);if(front<2.2)turn+=(left>right?1:-1)*2.2*(1-front/2.2);
+ r.th+=turn*dt;const v=Math.min(S.cap,1.0)*(front<1.2?.25:1)*(Math.abs(err)>1?.4:1);
+ r.x=clamp(r.x+Math.cos(r.th)*v*dt,.3,W-.3);r.y=clamp(r.y+Math.sin(r.th)*v*dt,.3,H-.3);
+ if(!S.trail.length||Math.hypot(r.x-S.trail.at(-1)[0],r.y-S.trail.at(-1)[1])>.3){S.trail.push([r.x,r.y]);if(S.trail.length>120)S.trail.shift()}}
+
+/* ============================== rendering ============================== */
+const cv=$("#map"),cx=cv.getContext("2d");let sc=1;
+function fit(c,ratio){const dpr=window.devicePixelRatio||1,w=c.clientWidth;c.width=w*dpr;c.height=(ratio?w*ratio:c.clientHeight)*dpr;if(ratio)c.style.height=(w*ratio)+"px";return dpr}
+function drawMap(){const dpr=fit(cv,H/W);sc=cv.width/W;const g=cx;g.clearRect(0,0,cv.width,cv.height);
+ g.strokeStyle="#0f2a40";g.lineWidth=1;for(let i=0;i<=W;i+=2){g.beginPath();g.moveTo(i*sc,0);g.lineTo(i*sc,cv.height);g.stroke()}for(let j=0;j<=H;j+=2){g.beginPath();g.moveTo(0,j*sc);g.lineTo(cv.width,j*sc);g.stroke()}
+ g.fillStyle="#12304a";g.strokeStyle="#2a6c9a";OBST.forEach(o=>{g.beginPath();g.arc(o.x*sc,o.y*sc,o.r*sc,0,7);g.fill();g.stroke()});
+ const r=S.robot;g.strokeStyle="rgba(0,229,255,.22)";S.rays.forEach(([a,d])=>{g.beginPath();g.moveTo(r.x*sc,r.y*sc);g.lineTo((r.x+Math.cos(a)*d)*sc,(r.y+Math.sin(a)*d)*sc);g.stroke()});
+ g.strokeStyle="rgba(45,255,160,.5)";g.beginPath();S.trail.forEach((p,i)=>i?g.lineTo(p[0]*sc,p[1]*sc):g.moveTo(p[0]*sc,p[1]*sc));g.stroke();
+ g.fillStyle="#8b7bff";S.wps.forEach((w,i)=>{g.beginPath();g.arc(w.x*sc,w.y*sc,(i===S.wi?5:3)*dpr,0,7);g.fill()});
+ if(S.attacks.spoof&&!S.attacks.spoof.isolated){g.strokeStyle="#ff4d6d";g.setLineDash([6,4]);for(let i=0;i<3;i++){const x=(8+((Date.now()/300+i*7)%14))*sc,y=(3+i*5)*sc;g.strokeRect(x,y,2.2*sc,2.2*sc);g.fillStyle="#ff4d6d";g.font=(11*dpr)+"px monospace";g.fillText("ghost?",x,y-4)}g.setLineDash([])}
+ if(S.attacks.gps&&!S.attacks.gps.isolated){g.strokeStyle="#ffb347";g.beginPath();g.arc((r.x+S.drift.x)*sc,(r.y+S.drift.y)*sc,10*dpr,0,7);g.stroke()}
+ if(S.attacks.dos&&!S.attacks.dos.isolated){g.fillStyle="#ff4d6d";for(let i=0;i<40;i++){g.fillRect(Math.random()*cv.width,Math.random()*cv.height,2*dpr,2*dpr)}}
+ g.save();g.translate(r.x*sc,r.y*sc);g.rotate(r.th);g.fillStyle=S.estop?"#ff4d6d":"#00e5ff";g.shadowColor=g.fillStyle;g.shadowBlur=14;g.beginPath();g.moveTo(14*dpr,0);g.lineTo(-9*dpr,8*dpr);g.lineTo(-9*dpr,-8*dpr);g.closePath();g.fill();g.restore();
+ if(S.estop){g.strokeStyle="#ff4d6d";g.lineWidth=4*dpr;g.strokeRect(0,0,cv.width,cv.height);g.lineWidth=1}}
+const chv=$("#chart"),cc=chv.getContext("2d");
+function drawChart(){fit(chv);const g=cc,w=chv.width,h=chv.height;g.clearRect(0,0,w,h);
+ const line=(arr,col,max)=>{g.strokeStyle=col;g.beginPath();arr.forEach((v,i)=>{const x=i/59*w,y=h-clamp(v/max,0,1)*(h-8)-4;i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()};
+ line(S.series.score,"#00e5ff",1);line(S.series.cmd,"#ffb347",Math.max(30,...S.series.cmd));g.fillStyle="#6f9bb3";g.font=(10*(window.devicePixelRatio||1))+"px monospace";g.fillText("score (cyan) · cmd_vel Hz (amber)",6,12)}
+
+/* ============================== IDS (mirrors the Python engine) ============================== */
+const FEATS=["cmdHz","odomHz","camHz","cpu","visAnom","odomJump","rogue"];
+function sample(){const a=S.attacks,live=n=>a[n]&&!a[n].isolated;
+ return [10+gauss()*.4+(live("dos")?380+gauss()*20:0)+(live("rogue")?10:0),20+gauss()*.4,15+gauss()*.3,35+gauss()*1.5+(live("dos")?40:0),.05+Math.abs(gauss())*.01+(live("spoof")?.9:0),Math.abs(gauss())*.02+(live("gps")?6:0),live("rogue")?1:0]}
+function log(sev,text,extra){const d=el("div",sev,"");d.textContent=new Date().toLocaleTimeString()+"  ["+sev.toUpperCase()+"] "+text+(extra?"  → "+extra:"");const L=$("#log");L.prepend(d);while(L.children.length>60)L.lastChild.remove();S.threats.unshift({ts:Date.now(),sev,text,extra});S.threats.length=Math.min(S.threats.length,30)}
+async function sha(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("").slice(0,16)}
+function evaluate(v){const reasons=[];let sev="none",pb="",isolate=null;const z=v.map((x,i)=>Math.abs(x-S.mean[i])/S.std[i]);
+ if(v[6]>0){reasons.push("unauthorized_publisher:/cmd_vel:attacker_rogue (T0855)");sev="critical";pb="PB-01";isolate="rogue"}
+ if(S.estop&&v[0]>S.mean[0]*3){reasons.push("cmd_vel_override_during_estop");sev="critical"}
+ const zi=z.slice(0,6).reduce((b,x,i)=>x>z[b]?i:b,0);S.score=clamp(z[zi]/16,0,1);
+ if(z[zi]>8&&sev!=="critical"){const f=FEATS[zi];if(f==="cmdHz"){reasons.push("flood:/cmd_vel (T0814)");sev="high";pb="PB-03";isolate="dos"}
+  else if(f==="visAnom"){reasons.push("visual_spoofing:camera (T0856)");sev="high";pb="PB-02";isolate="spoof"}
+  else if(f==="odomJump"){reasons.push("gps_denial:odom_jump (T0856)");sev="high";pb="PB-04";isolate="gps"}
+  else{reasons.push("ml_anomaly:"+f);sev="medium"}}
+ return {reasons,sev,pb,isolate}}
+async function respond(d){if(!d.reasons.length)return;const key=d.reasons.join("|"),now=Date.now();if(now-(S.cool[key]||0)<6000)return;S.cool[key]=now;S.lastThreat=now;const acts=[];
+ if(d.sev==="critical"){S.estop=true;acts.push("E-STOP engaged");if(d.isolate==="rogue"){const rec=await sha("attacker_rogue"+now);S.revoked.push(rec);acts.push("HSM revoked cert attacker_rogue (serial "+rec+")");if(S.attacks.rogue)S.attacks.rogue.isolated=true}}
+ else if(d.pb==="PB-03"){S.cap=.4;S.profile="degraded_safe";acts.push("isolated flooding node","speed cap 0.4 m/s","degraded-safe profile");if(S.attacks.dos)S.attacks.dos.isolated=true}
+ else if(d.pb==="PB-02"){S.fusion={cam:.1,lidar:.7,odom:.2};S.cap=.3;S.profile="sensor_distrust";acts.push("camera fusion weight → 0.1","speed cap 0.3 m/s");if(S.attacks.spoof)S.attacks.spoof.isolated=true}
+ else if(d.pb==="PB-04"){S.cap=.5;S.profile="lidar_odometry";acts.push("localization → LiDAR odom","speed cap 0.5 m/s");if(S.attacks.gps)S.attacks.gps.isolated=true;S.drift={x:0,y:0}}
+ else acts.push("flagged for review");
+ log(d.sev,d.reasons.join(" | ")+(d.pb?" ["+d.pb+"]":""),acts.join("; "))}
+async function idsTick(){S.ticks++;const v=sample();S.cmdHz=v[0];
+ if(!S.ready){S.base.push(v);if(S.base.length>=12){S.mean=FEATS.map((_,i)=>S.base.reduce((s,r)=>s+r[i],0)/S.base.length);S.std=FEATS.map((_,i)=>{const m=S.mean[i],sd=Math.sqrt(S.base.reduce((s,r)=>s+(r[i]-m)**2,0)/S.base.length);return Math.max(sd,.05*Math.abs(m),.02)});S.ready=true;
+   $("#ready").textContent="baseline ready";$("#ready").className="tag2 ok";document.querySelectorAll(".atk").forEach(b=>b.disabled=false);log("info","baseline learned from 12 clean windows; IDS armed")}
+  else $("#ready").textContent="learning baseline "+S.base.length+"/12";}
+ else{const d=evaluate(v);await respond(d)}
+ for(const [n,a] of Object.entries(S.attacks)){if(Date.now()-a.t0>10000){delete S.attacks[n];log("info","attack '"+n+"' ended")}}
+ if(S.attacks.gps&&!S.attacks.gps.isolated){S.drift.x+=1.5;S.drift.y-=.8}
+ const live=Object.values(S.attacks).some(a=>!a.isolated);
+ if(S.ready&&!live&&S.lastThreat&&Date.now()-S.lastThreat>9000&&(S.profile!=="nominal")&&!S.estop){S.cap=1;S.fusion={cam:.4,lidar:.4,odom:.2};S.profile="nominal";log("info","self-healing complete: nominal profile restored")}
+ S.series.score.push(S.score);S.series.cmd.push(S.cmdHz);S.series.cpu.push(v[3]);for(const k in S.series)if(S.series[k].length>60)S.series[k].shift();updateUI()}
+function updateUI(){$("#mScore").textContent=S.score.toFixed(2);$("#mScore").className=S.score>.5?"bad":"ok";$("#mCmd").textContent=Math.round(S.cmdHz);$("#mCap").textContent=S.cap.toFixed(1);
+ const st=$("#mStop");st.textContent=S.estop?"ENGAGED":"RELEASED";st.className=S.estop?"bad pulse":"ok";const p=$("#mProf");p.textContent=S.profile;p.className=S.profile==="nominal"?"ok":"warn";
+ $("#mFus").textContent=[S.fusion.cam,S.fusion.lidar,S.fusion.odom].join("/").replace(/0\./g,".");
+ const nb=$("#nodes");nb.textContent="";const hot=n=>Object.keys(S.attacks).some(k=>!S.attacks[k].isolated&&n===k);
+ [["ros2-core","ok"],["vision","spoof"],["brain","ok"],["ids","ok"],["hsm","ok"]].forEach(([n,a])=>{const bad=a!=="ok"&&hot(a);nb.appendChild(el("span","node "+(bad?"warn":"ok"),n+(bad?" ⚠":"")))});
+ if(S.revoked.length)nb.appendChild(el("span","node bad","attacker_rogue REVOKED"));if(S.attacks.rogue&&!S.attacks.rogue.isolated)nb.appendChild(el("span","node bad pulse","attacker_rogue ⚠ untrusted"));drawChart()}
+
+/* ============================== mission planner (JS port of agentic_brain.plan_mission) ============================== */
+function planMission(text){const t=text.toLowerCase(),sm=t.match(/(\d+(?:\.\d+)?)\s*m\/s/),speed=Math.min(sm?+sm[1]:.5,1);let x=S.robot.x,y=S.robot.y;const wps=[];
+ const DIRS={north:[0,-1],south:[0,1],east:[1,0],west:[-1,0],forward:[1,0],back:[-1,0]};
+ for(const step of t.split(/\bthen\b|;|\band\b/)){const c=step.match(/\(?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)?/);
+  if(c){x=clamp(+c[1],.5,W-.5);y=clamp(+c[2],.5,H-.5);wps.push({x,y});continue}
+  for(const [w,[dx,dy]] of Object.entries(DIRS)){if(step.includes(w)){const dm=step.match(/(\d+(?:\.\d+)?)\s*m\b(?!\/)/),d=dm?+dm[1]:5;x=clamp(x+dx*d,.5,W-.5);y=clamp(y+dy*d,.5,H-.5);wps.push({x,y});break}}}
+ if(!wps.length)return {ok:false,error:"no actionable waypoints parsed"};S.wps=wps;S.wi=0;S.loop=false;S.cap=Math.min(S.cap,speed);S.trail=[];return {ok:true,waypoints:wps.length,speed}}
+
+/* ============================== RAG knowledge (client-side vectors) ============================== */
+const KB=[
+ ["T0855 Unauthorized Command Message","An adversary sends velocity commands from a node that is not authorized to actuate. Indicators: /cmd_vel publishers other than nav2 or the mission brain, command rate spikes, commands during e-stop. Response: revoke the offending node certificate, assert e-stop, fall back to nav2-only command path."],
+ ["T0856 Spoof Reporting Message","False sensor or status data injected to mislead the controller. Indicators: camera anomaly score high while LiDAR range disagrees, odometry jumps, GPS inconsistent with wheel odometry. Response: lower fusion weight of the suspect sensor, rely on remaining modalities, slow the robot."],
+ ["T0814 Denial of Service","Message flooding exhausts CPU or network. Indicators: topic frequency far above nominal, dropped packets, CPU saturation, DDS discovery storms. Response: isolate the flooding publisher, rate-limit, switch to degraded safe navigation profile."],
+ ["T0830 Adversary-in-the-Middle","Traffic intercepted or altered on the network path. Indicators: SROS2 authentication failures, unexpected participants, certificate mismatch. Response: rotate keys, enforce strategy Enforce, re-establish trust through the HSM."],
+ ["T0886 Rogue node injection","A new node joins the DDS domain and subscribes to sensitive topics. Indicators: unexpected subscriptions, unknown node names, new network sockets. Response: revoke certificate, audit syscalls with the eBPF guardian."],
+ ["T0836 Modify Parameter","Navigation or safety parameters altered to unsafe values such as speed limits or costmap inflation. Response: restore last known-good parameters and flag for human review."],
+ ["NIST 800-82 segmentation and least privilege","Separate control traffic from supervisory traffic. Each component receives only the topics and resources it needs. Combine authentication, encryption, anomaly detection and physical safety interlocks."],
+ ["NIST 800-82 fail-safe behavior","On loss of integrity or availability the system should move to a safe state, stop or controlled degradation, rather than continue unsupervised. Keep tamper-evident logs and predefined incident playbooks."],
+ ["ISO/SAE 21434 TARA","Threat analysis and risk assessment: identify assets, damage scenarios, threat scenarios, attack paths, feasibility and risk value; assign cybersecurity goals. For mobile robots treat actuation commands, localization sensors and update channels as high-value assets."],
+ ["Playbook PB-01 rogue cmd_vel","Severity critical. Assert e-stop, revoke the publisher certificate, resume only after nav2 identity is verified, replan with reduced speed."],
+ ["Playbook PB-02 camera spoofing","Severity high. Reduce camera fusion weight to 0.1, raise LiDAR weight, cap speed at 0.3 m/s, request operator confirmation before resuming."],
+ ["Playbook PB-03 message flood","Severity high. Isolate the flooding node, enable rate limits, switch to degraded navigation profile with larger safety margins."],
+ ["Playbook PB-04 GPS denial","Severity medium. Switch localization to LiDAR odometry plus wheel odometry, shrink mission radius, return to last verified waypoint if drift exceeds threshold."],
+ ["Post-quantum identity","Hybrid Ed25519 plus CRYSTALS-Dilithium3 signatures for node identity and signed certificate revocation lists; Kyber for key encapsulation is the next hook."]];
+function emb(t){const v=new Float32Array(256);(t.toLowerCase().match(/[a-z0-9_\/]+/g)||[]).forEach(w=>{let h=2166136261;for(let i=0;i<w.length;i++){h^=w.charCodeAt(i);h=Math.imul(h,16777619)>>>0}v[h%256]+=(h>>>31)?1:-1});let n=0;for(const x of v)n+=x*x;n=Math.sqrt(n)||1;return v.map(x=>x/n)}
+const KBV=KB.map(([t,x])=>emb(t+" "+x));
+function searchKB(q,k=3){const e=emb(q);return KBV.map((v,i)=>{let s=0;for(let j=0;j<256;j++)s+=v[j]*e[j];return {i,s}}).sort((a,b)=>b.s-a.s).slice(0,k).map(({i,s})=>({title:KB[i][0],text:KB[i][1],score:+s.toFixed(3)}))}
+function renderHits(){const h=$("#hits");h.textContent="";searchKB($("#q").value||"unauthorized cmd_vel").forEach(r=>{const c=el("div","card");c.style.marginBottom="8px";c.appendChild(el("h3","",r.title+"  ·  "+r.score));c.appendChild(el("div","mut",r.text));h.appendChild(c)})}
+
+/* ============================== NEXUS-AI copilot (Groq in-browser tool calling) ============================== */
+const GROQ="https://api.groq.com/openai/v1";let history=[];
+const TOOLS=[
+ {n:"get_robot_state",d:"Live telemetry: anomaly score, cmd_vel Hz, e-stop, profile, speed cap, fusion weights, revoked certs.",p:{}},
+ {n:"recent_threats",d:"Most recent IDS alerts and the responses taken.",p:{limit:{type:"integer"}}},
+ {n:"search_kb",d:"RAG search over MITRE ATT&CK for ICS, NIST 800-82, ISO 21434 and response playbooks.",p:{query:{type:"string"}},r:["query"]},
+ {n:"plan_mission",d:"Convert a natural-language directive such as 'go to (5,3) then north 10 m at 0.6 m/s' into waypoints for the robot.",p:{directive:{type:"string"}},r:["directive"]},
+ {n:"run_attack",d:"Launch a SIMULATED attack in the sandbox to demonstrate defenses. attack is one of dos, rogue, spoof, gps.",p:{attack:{type:"string",enum:["dos","rogue","spoof","gps"]}},r:["attack"]},
+ {n:"engage_estop",d:"Engage the emergency stop. The assistant can never release it.",p:{reason:{type:"string"}},r:["reason"]}
+].map(t=>({type:"function",function:{name:t.n,description:t.d,parameters:{type:"object",properties:t.p,required:t.r||[]}}}));
+function startAttack(a){if(!S.ready)return {ok:false,error:"IDS still learning baseline"};if(!["dos","rogue","spoof","gps"].includes(a))return {ok:false,error:"unknown attack"};S.attacks[a]={t0:Date.now(),isolated:false};if(a==="gps")S.drift={x:0,y:0};log("info","simulated attack launched: "+a);return {ok:true,attack:a}}
+function engage(reason){S.estop=true;log("info","e-stop engaged: "+reason);updateUI();return {ok:true,note:"release requires a human operator"}}
+const IMPL={get_robot_state:()=>({score:+S.score.toFixed(3),cmd_vel_hz:Math.round(S.cmdHz),estop:S.estop,profile:S.profile,speed_cap:S.cap,fusion:S.fusion,revoked_certs:S.revoked.length,baseline_ready:S.ready,active_attacks:Object.keys(S.attacks)}),
+ recent_threats:({limit=5}={})=>S.threats.slice(0,clamp(limit|0||5,1,15)).map(t=>({sev:t.sev,text:t.text,response:t.extra})),
+ search_kb:({query})=>searchKB(String(query)),plan_mission:({directive})=>planMission(String(directive)),run_attack:({attack})=>startAttack(attack),engage_estop:({reason})=>engage(String(reason||"assistant"))};
+const SYS="You are NEXUS-AI, copilot of SecureNav-NEXUS, a zero-trust autonomous robot platform running as a browser simulation. Be concise (under 120 words). Call tools to read live state before claiming facts. Explain threats with MITRE ATT&CK for ICS terms and the playbooks. You may launch simulated attacks when asked and engage the e-stop when safety is at risk; you can never release it, so tell the operator to press the Release button.";
+const key=()=>localStorage.getItem("nexus_groq_key")||"";
+function addMsg(who,text,tag){const m=el("div","msg "+who);m.textContent=text;if(tag)m.appendChild(el("span","tag",tag));const b=$("#msgs");b.appendChild(m);b.scrollTop=b.scrollHeight;return m}
+async function groqCall(messages){const r=await fetch(GROQ+"/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key()},body:JSON.stringify({model:$("#model").value,messages,tools:TOOLS,tool_choice:"auto",temperature:.2,max_tokens:600})});
+ if(!r.ok){const t=await r.text();const e=new Error(r.status===401?"Groq rejected the key (401).":r.status===429?"Groq rate limit reached (429); wait a minute.":"Groq error "+r.status+": "+t.slice(0,160));e.status=r.status;throw e}return (await r.json()).choices[0].message}
+async function askGroq(text){const msgs=[{role:"system",content:SYS},...history.slice(-8),{role:"user",content:text}],used=[];
+ for(let i=0;i<4;i++){const m=await groqCall(msgs);if(!m.tool_calls||!m.tool_calls.length)return {reply:m.content||"(no reply)",used};
+  msgs.push(m);for(const c of m.tool_calls){let res;try{const f=IMPL[c.function.name];res=f?await f(JSON.parse(c.function.arguments||"{}")):{error:"unknown tool"}}catch(e){res={error:String(e.message||e)}}used.push(c.function.name);msgs.push({role:"tool",tool_call_id:c.id,content:JSON.stringify(res).slice(0,3000)})}}
+ return {reply:"Tool-call limit reached; please narrow the request.",used}}
+function offline(text){const t=text.toLowerCase();
+ const atk=t.match(/\b(dos|flood|rogue|spoof|gps)\b/);
+ if(/\b(run|launch|start|simulate|attack)\b/.test(t)&&atk){const a={flood:"dos"}[atk[1]]||atk[1];const r=startAttack(a);return {reply:r.ok?"Launched simulated "+a+" attack. Watch the log: the IDS should detect it, apply the playbook and self-heal.":"Cannot launch: "+r.error,used:["run_attack"]}}
+ if(/(stop|halt|emergency)/.test(t)){engage("operator request");return {reply:"Emergency stop engaged. Press Release e-stop when the area is safe.",used:["engage_estop"]}}
+ if(/(go to|patrol|north|south|east|west|waypoint|\(\d)/.test(t)){const r=planMission(text);return {reply:r.ok?"Mission planned with "+r.waypoints+" waypoints at "+r.speed+" m/s.":"I could not parse waypoints. Try: go to (20,5) then north 6 m.",used:["plan_mission"]}}
+ if(/(status|state|health|telemetry|score)/.test(t)){const s=IMPL.get_robot_state();return {reply:"Anomaly score "+s.score+", cmd_vel "+s.cmd_vel_hz+" Hz, e-stop "+(s.estop?"ENGAGED":"released")+", profile "+s.profile+", speed cap "+s.speed_cap+" m/s, revoked certs "+s.revoked_certs+".",used:["get_robot_state"]}}
+ if(/(threat|alert|last|explain|happened)/.test(t)){const th=IMPL.recent_threats({limit:3});if(!th.length)return {reply:"No threats yet. Launch an attack from the lab to see detection and response.",used:["recent_threats"]};
+  const top=th[0],kb=searchKB(top.text,1)[0];return {reply:"Latest: ["+top.sev+"] "+top.text+"\nResponse: "+(top.response||"n/a")+"\n\nWhy: "+kb.text,used:["recent_threats","search_kb"]}}
+ const h=searchKB(text,1)[0];return {reply:h.title+": "+h.text+"\n\n(Offline mode. Add a free Groq key for full reasoning.)",used:["search_kb"]}}
+async function send(text){text=(text||$("#chatIn").value).trim();if(!text)return;$("#chatIn").value="";addMsg("u",text);const wait=addMsg("a","…");
+ let out;if(key()){try{out=await askGroq(text);S.mode="groq"}catch(e){out=offline(text);out.reply=out.reply+"\n\n["+e.message+" Using offline mode.]";S.mode="offline"}}else{out=offline(text);S.mode="offline"}
+ wait.remove();addMsg("a",out.reply,(S.mode==="groq"?"Groq · "+$("#model").value:"offline copilot")+(out.used.length?" · tools: "+[...new Set(out.used)].join(", "):""));
+ history.push({role:"user",content:text},{role:"assistant",content:out.reply});$("#aiMode").textContent="mode: "+S.mode;
+ if($("#tts").checked&&"speechSynthesis" in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(out.reply.slice(0,350)))}}
+async function loadModels(){if(!key())return;try{const r=await fetch(GROQ+"/models",{headers:{Authorization:"Bearer "+key()}});if(!r.ok)return;const ids=(await r.json()).data.map(m=>m.id).filter(i=>!/whisper|tts|guard|embed|playai|orpheus/i.test(i)).sort();if(!ids.length)return;const sel=$("#model"),cur=localStorage.getItem("nexus_groq_model")||"llama-3.3-70b-versatile";sel.textContent="";ids.forEach(i=>{const o=el("option","",i);o.value=i;sel.appendChild(o)});sel.value=ids.includes(cur)?cur:ids[0]}catch(e){}}
+
+/* ============================== wiring ============================== */
+document.querySelectorAll(".atk").forEach(b=>b.onclick=()=>startAttack(b.dataset.a));
+$("#release").onclick=()=>{S.estop=false;log("info","operator released e-stop");updateUI()};
+$("#estopBtn").onclick=()=>engage("operator");
+$("#planBtn").onclick=()=>{const r=planMission($("#mission").value);log("info",r.ok?"mission planned: "+r.waypoints+" waypoints @ "+r.speed+" m/s":"mission parse failed: "+r.error)};
+$("#send").onclick=()=>send();$("#chatIn").addEventListener("keydown",e=>{if(e.key==="Enter")send()});
+$("#qBtn").onclick=renderHits;$("#q").addEventListener("keydown",e=>{if(e.key==="Enter")renderHits()});
+$("#saveKey").onclick=async()=>{const k=$("#key").value.trim();if(!/^gsk_/.test(k)){alert("A Groq key starts with gsk_");return}localStorage.setItem("nexus_groq_key",k);$("#key").value="";await loadModels();S.mode="groq";$("#aiMode").textContent="mode: groq (key saved)"};
+$("#clearKey").onclick=()=>{localStorage.removeItem("nexus_groq_key");S.mode="offline";$("#aiMode").textContent="mode: offline (key cleared)"};
+$("#model").onchange=e=>localStorage.setItem("nexus_groq_model",e.target.value);
+["Status","Run DoS attack","Run rogue attack","Explain last threat","Go to (25,4) then north 6 m"].forEach(q=>{const b=el("button","btn",q);b.style.fontSize="11px";b.onclick=()=>send(q);$("#quick").appendChild(b)});
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(SR){const rec=new SR();rec.lang="en-US";rec.onresult=e=>send(e.results[0][0].transcript);$("#mic").onclick=()=>{try{rec.start()}catch(e){}}}else $("#mic").style.display="none";
+addMsg("a","NEXUS-AI online. Try: \"run a DoS attack\", \"status\", \"explain the last threat\" or \"go to (25,4) then north 6 m\". Add a free Groq key on the right for full agentic reasoning.");
+if(key()){loadModels();$("#aiMode").textContent="mode: groq (key found)"}
+renderHits();
+let last=performance.now();function frame(t){const dt=Math.min((t-last)/1000,.1)*TS;last=t;physics(dt);drawMap();requestAnimationFrame(frame)}
+requestAnimationFrame(frame);setInterval(()=>{idsTick().catch(console.error)},1000);addEventListener("resize",()=>{drawMap();drawChart()});
+log("info","digital twin online; IDS learning clean baseline (12 s)");updateUI();
+</script>
+</body>
+</html>
