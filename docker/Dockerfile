@@ -76,7 +76,7 @@ USER nexus
 CMD ["python3", "-m", "fusion.ekf_fusion"]
 
 # ---------- dashboard ----------
-FROM python:3.11-slim AS dashboard
+FROM python:3.14-slim AS dashboard
 ENV PYTHONUNBUFFERED=1
 RUN pip install --no-cache-dir httpx==0.27.0 pydantic==2.6.4 fastapi==0.110.0 "uvicorn[standard]==0.29.0" websockets==12.0
 COPY src/dashboard /app
