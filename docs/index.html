@@ -359,12 +359,22 @@ const IMPL={get_robot_state:()=>({score:+S.score.toFixed(3),cmd_vel_hz:Math.roun
 const SYS="You are NEXUS-AI, copilot of SecureNav-NEXUS, a zero-trust autonomous robot platform running as a browser simulation. Be concise (under 120 words). Call tools to read live state before claiming facts. Explain threats with MITRE ATT&CK for ICS terms and the playbooks. You may launch simulated attacks when asked and engage the e-stop when safety is at risk; you can never release it, so tell the operator to press the Release button.";
 const key=()=>localStorage.getItem("nexus_groq_key")||"";
 function addMsg(who,text,tag){const m=el("div","msg "+who);m.textContent=text;if(tag)m.appendChild(el("span","tag",tag));const b=$("#msgs");b.appendChild(m);b.scrollTop=b.scrollHeight;return m}
-async function groqCall(messages){const r=await fetch(GROQ+"/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key()},body:JSON.stringify({model:$("#model").value,messages,tools:TOOLS,tool_choice:"auto",temperature:.2,max_tokens:600})});
- if(!r.ok){const t=await r.text();const e=new Error(r.status===401?"Groq rejected the key (401).":r.status===429?"Groq rate limit reached (429); wait a minute.":"Groq error "+r.status+": "+t.slice(0,160));e.status=r.status;throw e}return (await r.json()).choices[0].message}
+async function groqCall(messages,useTools=true){const body={model:$("#model").value,messages,temperature:.2,max_tokens:600};if(useTools){body.tools=TOOLS;body.tool_choice="auto"}
+ const r=await fetch(GROQ+"/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key()},body:JSON.stringify(body)});
+ if(!r.ok){const t=await r.text();const e=new Error(r.status===401?"Groq rejected the key (401).":r.status===429?"Groq rate limit reached (429); wait a minute.":"Groq error "+r.status+": "+t.slice(0,160));e.status=r.status;e.noTools=r.status===400&&/tool/i.test(t);throw e}return (await r.json()).choices[0].message}
+const TOOL_MODEL="llama-3.3-70b-versatile";
 async function askGroq(text){const msgs=[{role:"system",content:SYS},...history.slice(-8),{role:"user",content:text}],used=[];
- for(let i=0;i<4;i++){const m=await groqCall(msgs);if(!m.tool_calls||!m.tool_calls.length)return {reply:m.content||"(no reply)",used};
+ const run=async()=>{for(let i=0;i<4;i++){const m=await groqCall(msgs);if(!m.tool_calls||!m.tool_calls.length)return {reply:m.content||"(no reply)",used};
   msgs.push(m);for(const c of m.tool_calls){let res;try{const f=IMPL[c.function.name];res=f?await f(JSON.parse(c.function.arguments||"{}")):{error:"unknown tool"}}catch(e){res={error:String(e.message||e)}}used.push(c.function.name);msgs.push({role:"tool",tool_call_id:c.id,content:JSON.stringify(res).slice(0,3000)})}}
- return {reply:"Tool-call limit reached; please narrow the request.",used}}
+  return {reply:"Tool-call limit reached; please narrow the request.",used}};
+ try{return await run()}catch(e){
+  if(!e.noTools)throw e;
+  /* selected model cannot call tools: switch to a tool-capable model, else answer chat-only with live state injected */
+  const sel=$("#model");if(sel.value!==TOOL_MODEL&&[...sel.options].some(o=>o.value===TOOL_MODEL)){sel.value=TOOL_MODEL;localStorage.setItem("nexus_groq_model",TOOL_MODEL);msgs.length=0;msgs.push({role:"system",content:SYS},...history.slice(-8),{role:"user",content:text});
+   try{const out=await run();out.note="switched to "+TOOL_MODEL+" (previous model has no tool calling)";return out}catch(e2){if(!e2.noTools)throw e2}}
+  const ctx="Live state: "+JSON.stringify(IMPL.get_robot_state())+" Recent threats: "+JSON.stringify(IMPL.recent_threats({limit:3}))+" KB: "+JSON.stringify(searchKB(text,2));
+  const m=await groqCall([{role:"system",content:SYS+" You have no tools in this mode; use this context. "+ctx},...history.slice(-6),{role:"user",content:text}],false);
+  return {reply:m.content||"(no reply)",used:[],note:"chat-only mode (model without tool calling)"}}}
 function offline(text){const t=text.toLowerCase();
  const atk=t.match(/\b(dos|flood|rogue|spoof|gps)\b/);
  if(/\b(run|launch|start|simulate|attack)\b/.test(t)&&atk){const a={flood:"dos"}[atk[1]]||atk[1];const r=startAttack(a);return {reply:r.ok?"Launched simulated "+a+" attack. Watch the log: the IDS should detect it, apply the playbook and self-heal.":"Cannot launch: "+r.error,used:["run_attack"]}}
@@ -376,10 +386,13 @@ function offline(text){const t=text.toLowerCase();
  const h=searchKB(text,1)[0];return {reply:h.title+": "+h.text+"\n\n(Offline mode. Add a free Groq key for full reasoning.)",used:["search_kb"]}}
 async function send(text){text=(text||$("#chatIn").value).trim();if(!text)return;$("#chatIn").value="";addMsg("u",text);const wait=addMsg("a","…");
  let out;if(key()){try{out=await askGroq(text);S.mode="groq"}catch(e){out=offline(text);out.reply=out.reply+"\n\n["+e.message+" Using offline mode.]";S.mode="offline"}}else{out=offline(text);S.mode="offline"}
- wait.remove();addMsg("a",out.reply,(S.mode==="groq"?"Groq · "+$("#model").value:"offline copilot")+(out.used.length?" · tools: "+[...new Set(out.used)].join(", "):""));
+ wait.remove();addMsg("a",out.reply,(S.mode==="groq"?"Groq · "+$("#model").value:"offline copilot")+(out.used.length?" · tools: "+[...new Set(out.used)].join(", "):"")+(out.note?" · "+out.note:""));
  history.push({role:"user",content:text},{role:"assistant",content:out.reply});$("#aiMode").textContent="mode: "+S.mode;
  if($("#tts").checked&&"speechSynthesis" in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(out.reply.slice(0,350)))}}
-async function loadModels(){if(!key())return;try{const r=await fetch(GROQ+"/models",{headers:{Authorization:"Bearer "+key()}});if(!r.ok)return;const ids=(await r.json()).data.map(m=>m.id).filter(i=>!/whisper|tts|guard|embed|playai|orpheus/i.test(i)).sort();if(!ids.length)return;const sel=$("#model"),cur=localStorage.getItem("nexus_groq_model")||"llama-3.3-70b-versatile";sel.textContent="";ids.forEach(i=>{const o=el("option","",i);o.value=i;sel.appendChild(o)});sel.value=ids.includes(cur)?cur:ids[0]}catch(e){}}
+async function loadModels(){if(!key())return;try{const r=await fetch(GROQ+"/models",{headers:{Authorization:"Bearer "+key()}});if(!r.ok)return;
+ const bad=/whisper|tts|guard|embed|playai|orpheus|compound|safeguard|allam|distil|vision-preview/i;let ids=(await r.json()).data.map(m=>m.id).filter(i=>!bad.test(i));if(!ids.length)return;
+ ids.sort((a,b)=>(b===TOOL_MODEL)-(a===TOOL_MODEL)||(/llama/i.test(b)-/llama/i.test(a))||a.localeCompare(b));
+ const sel=$("#model"),cur=localStorage.getItem("nexus_groq_model");sel.textContent="";ids.forEach(i=>{const o=el("option","",i);o.value=i;sel.appendChild(o)});sel.value=ids.includes(cur)?cur:ids[0]}catch(e){}}
 
 /* ============================== wiring ============================== */
 document.querySelectorAll(".dock button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".dock button").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id==="p-"+b.dataset.tab))});
