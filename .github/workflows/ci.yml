@@ -1,0 +1,52 @@
+name: nexus-ci
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions: { contents: read }
+jobs:
+  lint-test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements/dev.txt
+      - name: Flake8
+        run: flake8 src sim scripts tests --max-line-length 170 --extend-ignore E203,W503
+      - name: MyPy
+        continue-on-error: true   # advisory until type hints are tightened
+        run: mypy src --ignore-missing-imports --no-strict-optional --explicit-package-bases
+      - name: Bandit (SAST)
+        run: bandit -r src sim scripts -ll -x tests
+      - name: Unit tests
+        run: pytest -q
+  ros2-integration:
+    runs-on: ubuntu-22.04
+    needs: lint-test
+    container: ros:iron
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: |
+          apt-get update && apt-get install -y python3-pip ros-iron-sros2
+          pip3 install -r requirements/base.txt -r requirements/dev.txt
+      - name: SROS2 keystore smoke test
+        shell: bash
+        run: |
+          source /opt/ros/iron/setup.bash
+          ./scripts/setup_sros2.sh /tmp/keystore
+          test -f /tmp/keystore/enclaves/nexus/ids/permissions.p7s
+  container-scan:
+    runs-on: ubuntu-22.04
+    needs: lint-test
+    strategy:
+      matrix: { target: [dashboard, hsm, brain, ids] }
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f docker/Dockerfile --target ${{ matrix.target }} -t nexus-${{ matrix.target }} .
+      - uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: nexus-${{ matrix.target }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"

@@ -42,7 +42,8 @@ def test_anomaly_engine_flags_flood_and_rogue():
         e.observe(base())
     assert e.ready
     assert not e.evaluate(base(), ["controller_server"], False, 10).anomalous
-    v = base(); v[FEATURE_NAMES.index("/cmd_vel_rate")] = 500
+    v = base()
+    v[FEATURE_NAMES.index("/cmd_vel_rate")] = 500
     assert e.evaluate(v, ["controller_server"], False, 500).anomalous
     d = e.evaluate(base(), ["controller_server", "evil"], False, 10)
     assert d.severity == "critical" and d.rogue_nodes == ["evil"]
@@ -53,7 +54,8 @@ def test_responder_estops_before_alert_and_respects_cooldown():
     order = []
     r = Responder(lambda b: order.append("estop"), lambda ev: order.append("alert"), lambda n, why: order.append("revoke"))
     det = Detection(True, 1.0, ["unauthorized_publisher:/cmd_vel:evil"], "critical", ["evil"])
-    r.respond(det); r.respond(det)
+    r.respond(det)
+    r.respond(det)
     assert order == ["estop", "revoke", "alert"]
 
 
@@ -100,7 +102,9 @@ def test_assistant_offline_tools():
     async def th(limit=5): return [{"severity": "high", "reasons": ["flood"]}]
     async def kb(query): return [{"text": "PB-03 isolate"}]
     called = []
-    async def es(reason): called.append(reason); return {"ok": True}
+    async def es(reason):
+        called.append(reason)
+        return {"ok": True}
     tools = {"get_robot_state": st, "recent_threats": th, "search_kb": kb, "engage_estop": es}
     ai = NexusAssistant(None)
     assert asyncio.run(ai.chat("status", [], tools))["mode"] == "offline"
