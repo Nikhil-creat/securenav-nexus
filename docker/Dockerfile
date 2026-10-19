@@ -38,6 +38,7 @@ FROM ros-base AS vision
 COPY requirements/vision.txt /tmp/vision.txt
 RUN pip3 install --no-cache-dir -r /tmp/vision.txt
 COPY src/vision /opt/nexus/vision
+COPY src/supply_chain /opt/nexus/supply_chain
 USER nexus
 CMD ["python3", "-m", "vision.vision_node"]
 
@@ -46,6 +47,8 @@ FROM ros-base AS brain
 COPY requirements/agents.txt /tmp/agents.txt
 RUN pip3 install --no-cache-dir -r /tmp/agents.txt
 COPY src/agents /opt/nexus/agents
+COPY src/fleet /opt/nexus/fleet
+COPY policy /opt/nexus/policy
 COPY knowledge /opt/nexus/knowledge
 USER nexus
 CMD ["python3", "-m", "agents.agentic_brain"]
@@ -65,12 +68,20 @@ COPY src/security /opt/nexus/security_nodes
 USER nexus
 CMD ["python3", "-m", "security_nodes.hsm_emulator"]
 
+# ---------- ekf fusion node ----------
+FROM ros-base AS fusion
+RUN apt-get update && apt-get install -y --no-install-recommends ros-iron-nav-msgs && rm -rf /var/lib/apt/lists/*
+COPY src/fusion /opt/nexus/fusion
+USER nexus
+CMD ["python3", "-m", "fusion.ekf_fusion"]
+
 # ---------- dashboard ----------
 FROM python:3.11-slim AS dashboard
 ENV PYTHONUNBUFFERED=1
 RUN pip install --no-cache-dir httpx==0.27.0 pydantic==2.6.4 fastapi==0.110.0 "uvicorn[standard]==0.29.0" websockets==12.0
 COPY src/dashboard /app
 COPY src/assistant /app/assistant
+COPY src/common /app/common
 COPY knowledge /app/knowledge
 WORKDIR /app
 RUN useradd -m nexus

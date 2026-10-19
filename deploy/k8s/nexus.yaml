@@ -1,0 +1,116 @@
+# Edge/fleet deployment (k3s or any Kubernetes). kubectl apply -f deploy/k8s/nexus.yaml
+# Images: ghcr.io/nikhil-creat/securenav-nexus-<service>:<tag> (built by .github/workflows/release.yml)
+apiVersion: v1
+kind: Namespace
+metadata: { name: nexus, labels: { pod-security.kubernetes.io/enforce: restricted } }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: default-deny, namespace: nexus }
+spec: { podSelector: {}, policyTypes: [Ingress, Egress] }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: allow-internal, namespace: nexus }
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  ingress: [{ from: [{ podSelector: {} }] }]
+  egress:
+    - to: [{ podSelector: {} }]
+    - to: [{ namespaceSelector: {} }]
+      ports: [{ port: 53, protocol: UDP }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: dashboard, namespace: nexus }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: dashboard } }
+  template:
+    metadata: { labels: { app: dashboard } }
+    spec:
+      securityContext: { runAsNonRoot: true, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: dashboard
+          image: ghcr.io/nikhil-creat/securenav-nexus-dashboard:latest
+          ports: [{ containerPort: 8080 }]
+          env:
+            - { name: LEDGER_DIR, value: /data/ledger }
+            - { name: DASHBOARD_TOKEN, valueFrom: { secretKeyRef: { name: nexus-secrets, key: dashboard-token } } }
+            - { name: GROQ_API_KEY, valueFrom: { secretKeyRef: { name: nexus-secrets, key: groq-api-key, optional: true } } }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: { drop: [ALL] } }
+          volumeMounts: [{ name: ledger, mountPath: /data/ledger }, { name: tmp, mountPath: /tmp }]
+          readinessProbe: { httpGet: { path: /health, port: 8080 } }
+          resources: { requests: { cpu: 100m, memory: 128Mi }, limits: { cpu: "1", memory: 512Mi } }
+      volumes:
+        - { name: ledger, persistentVolumeClaim: { claimName: ledger-pvc } }
+        - { name: tmp, emptyDir: {} }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: ledger-pvc, namespace: nexus }
+spec: { accessModes: [ReadWriteOnce], resources: { requests: { storage: 1Gi } } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: dashboard, namespace: nexus }
+spec: { selector: { app: dashboard }, ports: [{ port: 8080, targetPort: 8080 }] }
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: { name: qdrant, namespace: nexus }
+spec:
+  serviceName: qdrant
+  replicas: 1
+  selector: { matchLabels: { app: qdrant } }
+  template:
+    metadata: { labels: { app: qdrant } }
+    spec:
+      containers:
+        - name: qdrant
+          image: qdrant/qdrant:v1.8.4
+          ports: [{ containerPort: 6333 }]
+          volumeMounts: [{ name: data, mountPath: /qdrant/storage }]
+  volumeClaimTemplates:
+    - metadata: { name: data }
+      spec: { accessModes: [ReadWriteOnce], resources: { requests: { storage: 2Gi } } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: qdrant, namespace: nexus }
+spec: { selector: { app: qdrant }, ports: [{ port: 6333 }] }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: redis, namespace: nexus }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: redis } }
+  template:
+    metadata: { labels: { app: redis } }
+    spec:
+      containers: [{ name: redis, image: "redis:7.2-alpine", ports: [{ containerPort: 6379 }] }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: redis, namespace: nexus }
+spec: { selector: { app: redis }, ports: [{ port: 6379 }] }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: agentic-brain, namespace: nexus }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: agentic-brain } }
+  template:
+    metadata: { labels: { app: agentic-brain } }
+    spec:
+      securityContext: { runAsNonRoot: true, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: brain
+          image: ghcr.io/nikhil-creat/securenav-nexus-brain:latest
+          env:
+            - { name: QDRANT_URL, value: "http://qdrant:6333" }
+            - { name: REDIS_URL, value: "redis://redis:6379/0" }
+          securityContext: { allowPrivilegeEscalation: false, capabilities: { drop: [ALL] } }

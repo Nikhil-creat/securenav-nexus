@@ -20,6 +20,11 @@ jobs:
         run: bandit -r src sim scripts -ll -x tests
       - name: Unit tests
         run: pytest -q
+      - name: SBOM (CycloneDX)
+        run: pip install cyclonedx-bom==4.4.3 && cyclonedx-py requirements requirements/base.txt -o sbom.json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: sbom, path: sbom.json, if-no-files-found: ignore }
   ros2-integration:
     runs-on: ubuntu-22.04
     needs: lint-test

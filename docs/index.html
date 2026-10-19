@@ -52,8 +52,8 @@ canvas.trace{position:absolute;left:0;right:0;bottom:0;width:100%;height:54px;op
 .nodes{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.node{font-size:10px;border:1px solid var(--bd);border-radius:6px;padding:2px 8px;color:var(--mut)}
 .node.ok{color:var(--li);border-color:#c6ff3d44}.node.warn{color:var(--or);border-color:#ff5a1f66}.node.bad{color:var(--mg);border-color:#ff2e8877}
 .pulse{animation:bl 1s infinite}
-.dock{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px;border-radius:18px;background:#120f1bdd;backdrop-filter:blur(16px);border:1px solid var(--bd);box-shadow:0 10px 40px #000a}
-.dock button{background:transparent;border:0;border-radius:12px;padding:8px 2px;color:var(--mut);font-size:10px;letter-spacing:.12em;cursor:pointer}
+.dock{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:6px;border-radius:18px;background:#120f1bdd;backdrop-filter:blur(16px);border:1px solid var(--bd);box-shadow:0 10px 40px #000a}
+.dock button{background:transparent;border:0;border-radius:12px;padding:8px 2px;color:var(--mut);font-size:9px;letter-spacing:.08em;cursor:pointer}
 .dock button b{display:block;font-size:18px;font-weight:400;line-height:1.1}
 .dock button.on{background:var(--or);color:#000}
 .panels{margin-top:12px}.panel{display:none}.panel.on{display:block;animation:in .3s}@keyframes in{from{opacity:0;transform:translateY(8px)}}
@@ -87,6 +87,10 @@ details{border-top:1px solid var(--bd);padding:8px 0}summary{cursor:pointer;font
 .car{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 10px}
 .pc{flex:0 0 72%;max-width:260px;scroll-snap-align:start;border:1px solid var(--bd);border-radius:16px;padding:14px;background:linear-gradient(160deg,#ff5a1f1c,transparent 60%);color:var(--ice)}
 .pc i{font:700 30px var(--disp);color:#ffffff22;font-style:normal;display:block}.pc b{font:700 15px var(--disp);display:block;margin:2px 0 4px}
+.mod{display:block;padding:9px 0;border-bottom:1px dashed #ffffff14;color:var(--ice)}.mod b{color:var(--li);font-size:12.5px}.mod span{display:block;color:var(--mut);font-size:12px}
+.ver{display:inline-block;font:700 11px var(--disp);letter-spacing:.14em;background:var(--li);color:#000;border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+pre.code{background:#0b0a11;border:1px solid var(--bd);border-radius:10px;padding:10px;overflow:auto;font-size:11.5px;color:var(--li)}
+.lh{font-size:11px;color:var(--mut);word-break:break-all}.lh i{color:var(--or);font-style:normal}
 footer{text-align:center;color:var(--mut);font-size:11px;padding:18px 0}
 @media(min-width:960px){
  body{padding-bottom:24px}.app{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:start}
@@ -103,7 +107,7 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:18px 0}
 <section class="stagecol">
   <div class="stage">
     <canvas id="map"></canvas>
-    <div class="brand"><small>ZERO-TRUST AUTONOMY</small><h1>SECURENAV<br><span>NEXUS</span></h1></div>
+    <div class="brand"><small>ZERO-TRUST AUTONOMY · v2.0</small><h1>SECURENAV<br><span>NEXUS</span></h1></div>
     <div class="ringwrap"><div class="ring" id="ring"><b id="mScore">0.00</b></div><small>ANOMALY</small></div>
     <canvas id="chart" class="trace"></canvas>
   </div>
@@ -121,7 +125,7 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:18px 0}
 <section class="side">
  <nav class="dock" id="dock">
   <button class="on" data-tab="defend"><b>◈</b>DEFEND</button><button data-tab="ai"><b>✦</b>COPILOT</button>
-  <button data-tab="intel"><b>⌖</b>INTEL</button><button data-tab="op"><b>☰</b>OPERATOR</button>
+  <button data-tab="intel"><b>⌖</b>INTEL</button><button data-tab="proj"><b>⬡</b>PROJECT</button><button data-tab="op"><b>☰</b>OPERATOR</button>
  </nav>
  <div class="panels">
   <div class="panel on" id="p-defend">
@@ -137,6 +141,8 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:18px 0}
    <div class="card"><h3>Mission planner</h3><div class="mut">Natural language → Nav2-style waypoints</div>
     <div class="inp"><input id="mission" value="go to (25,4) then patrol south 8 m then (5,14) at 0.8 m/s" aria-label="mission"><button class="btn fill" id="planBtn">Plan</button></div></div>
    <div class="card"><h3>Response log</h3><div id="log"></div></div>
+   <div class="card"><h3>Tamper-evident ledger</h3><div class="mut">Every event is hash-chained (SHA-256) like the server-side signed ledger. Tamper with an entry, then verify.</div>
+    <div class="row"><button class="btn li" id="lgVerify">Verify chain</button><button class="btn mg" id="lgTamper">Tamper entry</button></div><div id="lgStat" class="mut"></div><div id="lgList" style="margin-top:6px"></div></div>
   </div>
 
   <div class="panel" id="p-ai">
@@ -164,6 +170,21 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:18px 0}
     <div class="layer"><i>08</i><span>CI/CD · Bandit · MyPy · Trivy</span></div>
     <div class="layer"><i>09</i><span>NEXUS-AI Groq copilot · tool calling</span></div>
     <div class="layer"><i>10</i><span>HSM emulator · Ed25519 + Dilithium3 hybrid</span></div></div>
+  </div>
+
+  <div class="panel" id="p-proj">
+   <div class="card"><h2>SecureNav-NEXUS<span class="ver">v2.0</span></h2><div class="mut">Master edition: a real, test-covered autonomy-defense platform, not just this console. The browser twin above mirrors its detection and response logic.</div>
+    <div class="row"><a class="btn li" href="https://github.com/Nikhil-creat/securenav-nexus" target="_blank" rel="noopener">Repository</a><a class="btn" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/documentation/ARCHITECTURE.md" target="_blank" rel="noopener">Architecture</a><a class="btn" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/documentation/TARA.md" target="_blank" rel="noopener">TARA</a><a class="btn" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a></div></div>
+   <div class="card"><h3>What is new in v2</h3>
+    <div class="row"><span class="node ok">EKF spoof gating</span><span class="node ok">signed audit ledger</span><span class="node ok">policy engine + OPA</span><span class="node ok">fleet CRDT revocation</span><span class="node ok">signed ML models</span><span class="node ok">Prometheus + Grafana</span><span class="node ok">nexusctl CLI</span><span class="node ok">K8s manifests</span><span class="node ok">CodeQL + SBOM</span></div></div>
+   <div class="card"><h3>Module map</h3><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/fusion/ekf_fusion.py" target="_blank" rel="noopener"><b>src/fusion/ekf_fusion.py</b><span>EKF sensor fusion with chi-square innovation gating: rejects spoofed GPS, decays trust, re-weights sensors</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/common/audit_ledger.py" target="_blank" rel="noopener"><b>src/common/audit_ledger.py</b><span>Hash-chained, Ed25519-signed, Merkle-checkpointed audit ledger (served at /api/ledger)</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/common/policy_engine.py" target="_blank" rel="noopener"><b>src/common/policy_engine.py</b><span>Geofence, no-go zones, speed zones; the brain refuses violating missions (+ policy/nexus.rego for OPA)</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/fleet/fleet_manager.py" target="_blank" rel="noopener"><b>src/fleet/fleet_manager.py</b><span>Hungarian optimal task allocation, heartbeats, signed revocation gossip as a CRDT, fleet-wide quarantine</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/supply_chain/model_signer.py" target="_blank" rel="noopener"><b>src/supply_chain/model_signer.py</b><span>Signed model manifests; vision node refuses tampered weights when NEXUS_REQUIRE_SIGNED=1</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/security/security_ids_node.py" target="_blank" rel="noopener"><b>src/security/security_ids_node.py</b><span>IsoForest + autoencoder + hard rules + eBPF; e-stop before analysis; HSM revocation</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/security/hsm_emulator.py" target="_blank" rel="noopener"><b>src/security/hsm_emulator.py</b><span>Encrypted vault, Ed25519 + Dilithium3 hybrid signatures, signed revocations</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/agents/agentic_brain.py" target="_blank" rel="noopener"><b>src/agents/agentic_brain.py</b><span>LangGraph: Security Audit (Qdrant RAG), Self-Healing, Mission Planner + policy gate</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/vision/vision_node.py" target="_blank" rel="noopener"><b>src/vision/vision_node.py</b><span>CNN + ViT perception, ONNX / TensorRT export, backend auto-select; train_vision.py for training</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/assistant/groq_assistant.py" target="_blank" rel="noopener"><b>src/assistant/groq_assistant.py</b><span>Groq tool-calling copilot: reads state, searches RAG, engages (never releases) e-stop</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/src/nexusctl.py" target="_blank" rel="noopener"><b>src/nexusctl.py</b><span>Operator CLI: keygen, sign/verify models, verify ledger, plan + policy check</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/deploy/k8s/nexus.yaml" target="_blank" rel="noopener"><b>deploy/k8s/nexus.yaml</b><span>Kubernetes: default-deny NetworkPolicy, restricted pod security, PVC for ledger</span></a><a class="mod" href="https://github.com/Nikhil-creat/securenav-nexus/blob/main/documentation/TARA.md" target="_blank" rel="noopener"><b>documentation/TARA.md</b><span>ISO/SAE 21434 style threat analysis: 10 threats, controls, residual risk</span></a></div>
+   <div class="card"><h3>Run it</h3><pre class="code">git clone https://github.com/Nikhil-creat/securenav-nexus
+cd securenav-nexus
+pip install -r requirements/dev.txt
+pytest -q
+PYTHONPATH=src python -m nexusctl plan "go to (25,4) then north 6 m"
+./scripts/setup_sros2.sh &amp;&amp; docker compose up --build
+docker compose --profile observability up   # Prometheus + Grafana</pre></div>
   </div>
 
   <div class="panel" id="p-op">
@@ -239,6 +260,7 @@ function drawMap(t){const [w,h]=sizeCanvas(cv);CW=w;CH=h;layout(w,h);const g=cx;
  /* floor */
  path([[0,0],[W,0],[W,H],[0,H]],0,true);const fg=g.createLinearGradient(0,OY,0,OY+(W+H)*.5*SC);fg.addColorStop(0,"#1a1120");fg.addColorStop(1,"#0d0a14");g.fillStyle=fg;g.fill();g.strokeStyle="rgba(255,90,31,.55)";g.lineWidth=1.5;g.stroke();
  g.lineWidth=1;g.strokeStyle="rgba(255,255,255,.06)";for(let i=2;i<W;i+=2){path([[i,0],[i,H]],0);g.stroke()}for(let j=2;j<H;j+=2){path([[0,j],[W,j]],0);g.stroke()}
+ ZONES.forEach(z=>{path(z.p,0,true);g.fillStyle=z.k==="nogo"?"rgba(255,46,136,.16)":"rgba(255,179,71,.12)";g.fill();g.strokeStyle=z.k==="nogo"?"rgba(255,46,136,.8)":"rgba(255,179,71,.6)";g.setLineDash([5,4]);g.stroke();g.setLineDash([]);const q=P((z.p[0][0]+z.p[2][0])/2,(z.p[0][1]+z.p[2][1])/2,0);g.fillStyle=g.strokeStyle;g.font="9px monospace";g.fillText(z.k==="nogo"?"NO-GO":"SLOW",q[0]-14,q[1])});
  const r=S.robot;
  /* sonar pulse */
  const ph=(t/1400)%1;path(circ(r.x,r.y,ph*7,36),0,true);g.strokeStyle="rgba(255,90,31,"+(.5*(1-ph))+")";g.lineWidth=1.5;g.stroke();
@@ -271,7 +293,12 @@ function drawChart(){const c=$("#chart"),[w,h]=sizeCanvas(c),g=c.getContext("2d"
 const FEATS=["cmdHz","odomHz","camHz","cpu","visAnom","odomJump","rogue"];
 function sample(){const a=S.attacks,live=n=>a[n]&&!a[n].isolated;
  return [10+gauss()*.4+(live("dos")?380+gauss()*20:0)+(live("rogue")?10:0),20+gauss()*.4,15+gauss()*.3,35+gauss()*1.5+(live("dos")?40:0),.05+Math.abs(gauss())*.01+(live("spoof")?.9:0),Math.abs(gauss())*.02+(live("gps")?6:0),live("rogue")?1:0]}
-function log(sev,text,extra){const d=el("div",sev,"");d.textContent=new Date().toLocaleTimeString()+"  ["+sev.toUpperCase()+"] "+text+(extra?"  → "+extra:"");const L=$("#log");L.prepend(d);while(L.children.length>60)L.lastChild.remove();S.threats.unshift({ts:Date.now(),sev,text,extra});S.threats.length=Math.min(S.threats.length,30)}
+function log(sev,text,extra){const d=el("div",sev,"");d.textContent=new Date().toLocaleTimeString()+"  ["+sev.toUpperCase()+"] "+text+(extra?"  → "+extra:"");const L=$("#log");L.prepend(d);while(L.children.length>60)L.lastChild.remove();S.threats.unshift({ts:Date.now(),sev,text,extra});ledgerAdd(sev.toUpperCase()+" "+text+(extra?" -> "+extra:""));S.threats.length=Math.min(S.threats.length,30)}
+const LEDGER=[];let lq=Promise.resolve();
+async function shaFull(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+function ledgerAdd(text){lq=lq.then(async()=>{const prev=LEDGER.length?LEDGER[LEDGER.length-1].hash:"0".repeat(64),seq=LEDGER.length+1,ts=Date.now();const hash=await shaFull(JSON.stringify({seq,ts,prev,text}));LEDGER.push({seq,ts,prev,text,hash});ledgerRender()}).catch(()=>{})}
+async function ledgerVerify(){let prev="0".repeat(64);for(const e of LEDGER){const h=await shaFull(JSON.stringify({seq:e.seq,ts:e.ts,prev:e.prev,text:e.text}));if(e.prev!==prev||h!==e.hash)return e.seq;prev=e.hash}return 0}
+function ledgerRender(){const L=document.querySelector("#lgList");if(!L)return;L.textContent="";LEDGER.slice(-5).reverse().forEach(e=>{const d=el("div","lh","");const i=el("i","","#"+e.seq+" ");d.appendChild(i);d.appendChild(document.createTextNode(e.hash.slice(0,12)+"… "+e.text.slice(0,70)));L.appendChild(d)})}
 async function sha(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("").slice(0,16)}
 function evaluate(v){const reasons=[];let sev="none",pb="",isolate=null;const z=v.map((x,i)=>Math.abs(x-S.mean[i])/S.std[i]);
  if(v[6]>0){reasons.push("unauthorized_publisher:/cmd_vel:attacker_rogue (T0855)");sev="critical";pb="PB-01";isolate="rogue"}
@@ -313,12 +340,25 @@ function incident(sev){S.chain=[1,0,0,0];updateUI();setTimeout(()=>{S.chain[1]=1
  if(sev==="critical"&&typeof navigator!=="undefined"&&navigator.vibrate){try{navigator.vibrate([120,60,120])}catch(e){}}}
 function chainHeal(){S.chain[3]=1;updateUI();setTimeout(()=>{S.chain=[0,0,0,0];updateUI()},4000)}
 /* ============================== mission planner (JS port of agentic_brain.plan_mission) ============================== */
+const ZONES=[{n:"charging_bay",k:"nogo",p:[[12,14],[16,14],[16,17.5],[12,17.5]]},{n:"pedestrian_lane",k:"slow",p:[[0,0],[8,0],[8,6],[0,6]],v:.5}];
+function onSeg(p,a,b){const c=(p[1]-a[1])*(b[0]-a[0])-(p[0]-a[0])*(b[1]-a[1]);return Math.abs(c)<1e-9&&p[0]>=Math.min(a[0],b[0])-1e-9&&p[0]<=Math.max(a[0],b[0])+1e-9&&p[1]>=Math.min(a[1],b[1])-1e-9&&p[1]<=Math.max(a[1],b[1])+1e-9}
+function pip(p,poly){let ins=false;for(let i=0,n=poly.length;i<n;i++){const a=poly[i],b=poly[(i+1)%n];if(onSeg(p,a,b))return true;if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])ins=!ins}return ins}
+const orient=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+function segInt(a,b,c,d){const o1=orient(a,b,c),o2=orient(a,b,d),o3=orient(c,d,a),o4=orient(c,d,b);return (o1*o2<0&&o3*o4<0)||onSeg(c,a,b)||onSeg(d,a,b)||onSeg(a,c,d)||onSeg(b,c,d)}
+function crosses(a,b,poly){if(pip(a,poly)||pip(b,poly))return true;return poly.some((p,i)=>segInt(a,b,p,poly[(i+1)%poly.length]))}
+function checkMission(start,wps,speed){const v=[],pts=[start,...wps.map(w=>[w.x,w.y])];let sp=Math.min(speed,1);
+ pts.slice(1).forEach((p,i)=>{if(p[0]<0||p[0]>W||p[1]<0||p[1]>H)v.push("outside_geofence:wp"+i)});
+ for(let i=0;i<pts.length-1;i++)for(const z of ZONES){if(!crosses(pts[i],pts[i+1],z.p))continue;if(z.k==="nogo")v.push("enters_nogo:"+z.n+":leg"+i);else sp=Math.min(sp,z.v)}
+ return {ok:!v.length,violations:v,speed:sp}}
 function planMission(text){const t=text.toLowerCase(),sm=t.match(/(\d+(?:\.\d+)?)\s*m\/s/),speed=Math.min(sm?+sm[1]:.5,1);let x=S.robot.x,y=S.robot.y;const wps=[];
  const DIRS={north:[0,-1],south:[0,1],east:[1,0],west:[-1,0],forward:[1,0],back:[-1,0]};
  for(const step of t.split(/\bthen\b|;|\band\b/)){const c=step.match(/\(?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)?/);
-  if(c){x=clamp(+c[1],.5,W-.5);y=clamp(+c[2],.5,H-.5);wps.push({x,y});continue}
-  for(const [w,[dx,dy]] of Object.entries(DIRS)){if(step.includes(w)){const dm=step.match(/(\d+(?:\.\d+)?)\s*m\b(?!\/)/),d=dm?+dm[1]:5;x=clamp(x+dx*d,.5,W-.5);y=clamp(y+dy*d,.5,H-.5);wps.push({x,y});break}}}
- if(!wps.length)return {ok:false,error:"no actionable waypoints parsed"};S.wps=wps;S.wi=0;S.loop=false;S.cap=Math.min(S.cap,speed);S.trail=[];return {ok:true,waypoints:wps.length,speed}}
+  if(c){x=+c[1];y=+c[2];wps.push({x,y});continue}
+  for(const [w,[dx,dy]] of Object.entries(DIRS)){if(step.includes(w)){const dm=step.match(/(\d+(?:\.\d+)?)\s*m\b(?!\/)/),d=dm?+dm[1]:5;x+=dx*d;y+=dy*d;wps.push({x,y});break}}}
+ if(!wps.length)return {ok:false,error:"no actionable waypoints parsed"};
+ const v=checkMission([S.robot.x,S.robot.y],wps,speed);
+ if(!v.ok)return {ok:false,error:"rejected by policy: "+v.violations.join("; ")};
+ S.wps=wps;S.wi=0;S.loop=false;S.cap=Math.min(S.cap,v.speed);S.trail=[];return {ok:true,waypoints:wps.length,speed:v.speed}}
 
 /* ============================== RAG knowledge (client-side vectors) ============================== */
 const KB=[
@@ -379,7 +419,7 @@ function offline(text){const t=text.toLowerCase();
  const atk=t.match(/\b(dos|flood|rogue|spoof|gps)\b/);
  if(/\b(run|launch|start|simulate|attack)\b/.test(t)&&atk){const a={flood:"dos"}[atk[1]]||atk[1];const r=startAttack(a);return {reply:r.ok?"Launched simulated "+a+" attack. Watch the log: the IDS should detect it, apply the playbook and self-heal.":"Cannot launch: "+r.error,used:["run_attack"]}}
  if(/(stop|halt|emergency)/.test(t)){engage("operator request");return {reply:"Emergency stop engaged. Press Release e-stop when the area is safe.",used:["engage_estop"]}}
- if(/(go to|patrol|north|south|east|west|waypoint|\(\d)/.test(t)){const r=planMission(text);return {reply:r.ok?"Mission planned with "+r.waypoints+" waypoints at "+r.speed+" m/s.":"I could not parse waypoints. Try: go to (20,5) then north 6 m.",used:["plan_mission"]}}
+ if(/(go to|patrol|north|south|east|west|waypoint|\(\d)/.test(t)){const r=planMission(text);return {reply:r.ok?"Mission approved by policy: "+r.waypoints+" waypoints at "+r.speed+" m/s.":(r.error&&r.error.startsWith("rejected")?"Mission "+r.error:"I could not parse waypoints. Try: go to (20,5) then north 6 m."),used:["plan_mission"]}}
  if(/(status|state|health|telemetry|score)/.test(t)){const s=IMPL.get_robot_state();return {reply:"Anomaly score "+s.score+", cmd_vel "+s.cmd_vel_hz+" Hz, e-stop "+(s.estop?"ENGAGED":"released")+", profile "+s.profile+", speed cap "+s.speed_cap+" m/s, revoked certs "+s.revoked_certs+".",used:["get_robot_state"]}}
  if(/(threat|alert|last|explain|happened)/.test(t)){const th=IMPL.recent_threats({limit:3});if(!th.length)return {reply:"No threats yet. Launch an attack from the lab to see detection and response.",used:["recent_threats"]};
   const top=th[0],kb=searchKB(top.text,1)[0];return {reply:"Latest: ["+top.sev+"] "+top.text+"\nResponse: "+(top.response||"n/a")+"\n\nWhy: "+kb.text,used:["recent_threats","search_kb"]}}
@@ -399,6 +439,8 @@ document.querySelectorAll(".dock button").forEach(b=>b.onclick=()=>{document.que
 document.querySelectorAll(".atk").forEach(b=>b.onclick=()=>startAttack(b.dataset.a));
 $("#release").onclick=()=>{if(S.estop){S.estop=false;log("info","operator released e-stop");chainHeal()}};
 $("#estopBtn").onclick=()=>engage("operator");
+$("#lgVerify").onclick=async()=>{const bad=await ledgerVerify();$("#lgStat").textContent=LEDGER.length?(bad?"✖ TAMPERED at entry #"+bad:"✔ chain intact ("+LEDGER.length+" entries)"):"no entries yet";$("#lgStat").style.color=bad?"var(--mg)":"var(--li)"};
+$("#lgTamper").onclick=()=>{if(!LEDGER.length)return;const e=LEDGER[Math.floor(Math.random()*LEDGER.length)];e.text=e.text+" (edited)";$("#lgStat").textContent="entry #"+e.seq+" modified, press Verify";$("#lgStat").style.color="var(--or)";ledgerRender()};
 $("#planBtn").onclick=()=>{const r=planMission($("#mission").value);log("info",r.ok?"mission planned: "+r.waypoints+" waypoints @ "+r.speed+" m/s":"mission parse failed: "+r.error)};
 $("#send").onclick=()=>send();$("#chatIn").addEventListener("keydown",e=>{if(e.key==="Enter")send()});
 $("#qBtn").onclick=renderHits;$("#q").addEventListener("keydown",e=>{if(e.key==="Enter")renderHits()});

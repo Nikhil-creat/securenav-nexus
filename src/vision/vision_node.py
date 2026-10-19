@@ -265,7 +265,10 @@ class TensorRTBackend(Backend):
 
 
 def select_backend(model_dir: Path, preference: str = "auto") -> Backend:
-    """Pick TensorRT > ONNX > Torch, falling back gracefully on any failure."""
+    """Pick TensorRT > ONNX > Torch, falling back gracefully on any failure. Verifies model signatures first."""
+    from supply_chain.model_signer import enforce
+
+    enforce(model_dir)  # raises when NEXUS_REQUIRE_SIGNED=1 and the artifacts are unsigned or modified
     engine, onnx_p, pt = model_dir / "nexus.engine", model_dir / "nexus.onnx", model_dir / "nexus.pt"
     order = ["tensorrt", "onnx", "torch"] if preference == "auto" else [preference, "torch"]
     for choice in order:

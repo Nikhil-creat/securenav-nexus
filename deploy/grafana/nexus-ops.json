@@ -1,0 +1,85 @@
+{
+ "title": "SecureNav-NEXUS Operations",
+ "uid": "nexus-ops",
+ "schemaVersion": 39,
+ "version": 1,
+ "refresh": "5s",
+ "time": {
+  "from": "now-15m",
+  "to": "now"
+ },
+ "panels": [
+  {
+   "id": 1,
+   "type": "timeseries",
+   "title": "Anomaly score",
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "datasource": "Prometheus",
+   "targets": [
+    {
+     "expr": "nexus_anomaly_score",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "type": "stat",
+   "title": "E-stop engaged",
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "datasource": "Prometheus",
+   "targets": [
+    {
+     "expr": "nexus_estop_engaged",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "type": "timeseries",
+   "title": "Threats by severity (rate/min)",
+   "gridPos": {
+    "x": 0,
+    "y": 8,
+    "w": 12,
+    "h": 8
+   },
+   "datasource": "Prometheus",
+   "targets": [
+    {
+     "expr": "sum by (severity) (increase(nexus_threats_total[1m]))",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "type": "timeseries",
+   "title": "Connected robots / operators",
+   "gridPos": {
+    "x": 12,
+    "y": 8,
+    "w": 12,
+    "h": 8
+   },
+   "datasource": "Prometheus",
+   "targets": [
+    {
+     "expr": "nexus_robot_producers or nexus_dashboard_clients",
+     "refId": "A"
+    }
+   ]
+  }
+ ]
+}

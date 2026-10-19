@@ -23,6 +23,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from common.audit_ledger import AuditLedger, load_or_create_key, verify_file
+from common.metrics import REGISTRY
 from assistant.groq_assistant import NexusAssistant, load_key, search_kb_local
 
 logging.basicConfig(level=logging.INFO, format='{"ts":"%(asctime)s","level":"%(levelname)s","msg":"%(message)s"}')
@@ -71,8 +73,12 @@ class Hub:
         kind = msg.get("kind")
         if kind == "threat":
             self.threats.appendleft(msg)
+            ledger.append({"event": "threat", **{k: msg.get(k) for k in ("type", "severity", "reasons", "score", "node")}})
+            REGISTRY.inc("nexus_threats_total", labels={"severity": str(msg.get("severity", "unknown"))}, help_="Threats detected by the IDS")
         elif kind == "telemetry":
             self.last = msg
+            REGISTRY.set("nexus_anomaly_score", float(msg.get("score", 0)), help_="Latest IDS anomaly score")
+            REGISTRY.set("nexus_estop_engaged", 1.0 if msg.get("estop") else 0.0, help_="1 when the e-stop is engaged")
             feats = msg.get("features", {})
             self.latency.append({"ts": msg.get("ts", time.time()), "score": float(msg.get("score", 0)),
                                  "cmd_vel_rate": float(feats.get("/cmd_vel_rate", 0)), "cpu": float(feats.get("cpu", 0))})
@@ -80,6 +86,8 @@ class Hub:
 
 
 hub = Hub()
+_LEDGER_DIR = Path(os.environ.get("LEDGER_DIR", "/tmp/nexus-ledger"))
+ledger = AuditLedger(_LEDGER_DIR / "ledger.jsonl", load_or_create_key(_LEDGER_DIR / "ledger.key"))
 
 
 class Override(BaseModel):
@@ -90,6 +98,28 @@ class Override(BaseModel):
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {"ok": True, "clients": len(hub.clients), "producers": len(hub.ingest)}
+
+
+@app.get("/metrics")
+async def metrics(authorization: Optional[str] = Header(default=None)) -> Any:
+    """Prometheus scrape endpoint (bearer token)."""
+    from fastapi.responses import PlainTextResponse
+
+    if not _authorized((authorization or "").removeprefix("Bearer ")):
+        raise HTTPException(401, "unauthorized")
+    REGISTRY.set("nexus_dashboard_clients", float(len(hub.clients)), help_="Connected dashboard clients")
+    REGISTRY.set("nexus_robot_producers", float(len(hub.ingest)), help_="Connected robot producers")
+    return PlainTextResponse(REGISTRY.render(), media_type="text/plain; version=0.0.4")
+
+
+@app.get("/api/ledger")
+async def ledger_view(n: int = 20, authorization: Optional[str] = Header(default=None)) -> dict[str, Any]:
+    """Tail of the signed audit ledger plus a full-chain verification result."""
+    if not _authorized((authorization or "").removeprefix("Bearer ")):
+        raise HTTPException(401, "unauthorized")
+    ok, bad, root = verify_file(ledger.path, ledger.public_key) if ledger.path.exists() else (True, None, "")
+    return {"entries": ledger.tail(max(1, min(n, 200))), "verified": ok, "first_bad_seq": bad, "merkle_root": root,
+            "public_key": __import__("base64").b64encode(ledger.public_key).decode()}
 
 
 @app.get("/api/state")
@@ -109,6 +139,7 @@ async def override(body: Override, authorization: Optional[str] = Header(default
     for ws in list(hub.ingest):
         await ws.send_json(cmd)
     await hub.broadcast({"kind": "threat", "type": "operator_override", "severity": "info", "reasons": [body.reason], "ts": cmd["ts"]})
+    ledger.append({"event": "operator_override", "estop": body.estop, "reason": body.reason})
     log.warning("operator override estop=%s", body.estop)
     return {"ok": True, "sent_to": len(hub.ingest)}
 

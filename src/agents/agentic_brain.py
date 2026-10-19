@@ -25,13 +25,14 @@ from qdrant_client import QdrantClient
 from qdrant_client.http import models as qm
 
 from common.logging_setup import get_logger
+from common.mission_parser import plan_mission
+from common.policy_engine import load_policy, validate_mission
 
 log = get_logger("nexus.brain")
 
 EMBED_DIM = 256
 COLLECTION = "nexus_security_kb"
 KB_DIR = Path(os.environ.get("NEXUS_KB_DIR", "/opt/nexus/knowledge"))
-MAX_SPEED = 1.0  # m/s hard ceiling the planner may never exceed
 
 
 # ------------------------------------------------------------------ embeddings + vector store
@@ -187,7 +188,8 @@ def make_graph(kb: KnowledgeBase) -> Any:
 
     def mission_planner(state: BrainState) -> BrainState:
         directive = str(state["event"].get("text", ""))
-        return {"mission": plan_mission(directive), "log": state.get("log", []) + ["plan:ok"]}
+        start = tuple(state["event"].get("start", (0.0, 0.0)))  # type: ignore[assignment]
+        return {"mission": plan_and_validate(directive, start), "log": state.get("log", []) + ["plan:ok"]}
 
     g = StateGraph(BrainState)
     g.add_node("security_audit", security_audit)
@@ -201,30 +203,23 @@ def make_graph(kb: KnowledgeBase) -> Any:
 
 
 # ------------------------------------------------------------------ mission planning
-_DIRS = {"north": (0, 1), "south": (0, -1), "east": (1, 0), "west": (-1, 0), "forward": (1, 0), "back": (-1, 0)}
+POLICY = load_policy(os.environ.get("NEXUS_POLICY"))
 
 
-def plan_mission(directive: str, speed_cap: float = MAX_SPEED) -> dict[str, Any]:
-    """Parse e.g. 'go to (5,3) then patrol north 10 m at 0.6 m/s' into Nav2-style waypoints."""
-    text = directive.lower()
-    speed = min(float(m.group(1)) if (m := re.search(r"(\d+(?:\.\d+)?)\s*m/s", text)) else 0.5, speed_cap)
-    waypoints: list[dict[str, float]] = []
-    x = y = 0.0
-    for step in re.split(r"\bthen\b|;|\band\b", text):
-        coord = re.search(r"\(?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)?", step)
-        if coord:
-            x, y = float(coord.group(1)), float(coord.group(2))
-            waypoints.append({"x": x, "y": y, "yaw": 0.0, "speed": speed})
-            continue
-        for word, (dx, dy) in _DIRS.items():
-            if word in step:
-                dist = float(m.group(1)) if (m := re.search(r"(\d+(?:\.\d+)?)\s*m\b(?!/)", step)) else 5.0
-                x, y = x + dx * dist, y + dy * dist
-                waypoints.append({"x": x, "y": y, "yaw": math.atan2(dy, dx), "speed": speed})
-                break
-    if not waypoints:
-        return {"ok": False, "error": "no actionable waypoints parsed", "waypoints": []}
-    return {"ok": True, "waypoints": waypoints, "speed": speed, "frame": "map"}
+def plan_and_validate(directive: str, start: tuple[float, float] = (0.0, 0.0)) -> dict[str, Any]:
+    """Parse a directive, then enforce geofence / no-go / speed policy. A mission that violates policy is NOT published."""
+    mission = plan_mission(directive, start=start)
+    if not mission["ok"]:
+        return mission
+    verdict = validate_mission(POLICY, mission["waypoints"], mission["speed"], start=start)
+    mission["speed"] = verdict.speed
+    for w in mission["waypoints"]:
+        w["speed"] = min(w["speed"], verdict.speed)
+    mission["policy"] = {"approved": verdict.ok, "violations": verdict.violations}
+    if not verdict.ok:
+        mission["ok"] = False
+        mission["error"] = "mission rejected by policy: " + "; ".join(verdict.violations)
+    return mission
 
 
 # ------------------------------------------------------------------ state store
@@ -285,7 +280,12 @@ def spin_ros() -> None:
             if out.get("actions"):
                 self.actions_pub.publish(String(data=json.dumps({"ts": ts, "triage": out["triage"], "actions": out["actions"]})))
             if out.get("mission"):
-                self.wp_pub.publish(String(data=json.dumps(out["mission"])))
+                mission = out["mission"]
+                if mission.get("ok"):
+                    self.wp_pub.publish(String(data=json.dumps(mission)))
+                else:
+                    log.warning("mission rejected", extra={"fields": {"error": mission.get("error")}})
+                    self.actions_pub.publish(String(data=json.dumps({"ts": ts, "mission_rejected": mission.get("error")})))
             self.status_pub.publish(String(data=json.dumps({"ts": ts, "kind": kind, "log": out.get("log", [])})))
 
     rclpy.init()

@@ -59,6 +59,12 @@ services:
       LLM_MODEL: ${LLM_MODEL:-llama3}
     depends_on: [qdrant, redis, ros2-core-node]
 
+  fusion-node:
+    <<: *ros-common
+    build: { context: ., dockerfile: docker/Dockerfile, target: fusion }
+    environment: { <<: *ros-env, NEXUS_ENCLAVE: /nexus/nav2, NEXUS_SERVICE: ekf_fusion }
+    depends_on: [ros2-core-node]
+
   qdrant:
     image: qdrant/qdrant:v1.8.4
     networks: [nexus-net]
@@ -110,13 +116,38 @@ services:
       DASHBOARD_TOKEN_FILE: /run/secrets/dashboard_token
       GROQ_API_KEY_FILE: /run/secrets/groq_api_key   # optional; empty file => offline assistant
       GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      LEDGER_DIR: /data/ledger
+    volumes: [ledger-data:/data/ledger]
     secrets: [dashboard_token, groq_api_key]
     restart: unless-stopped
+
+  # ---- observability (docker compose --profile observability up)
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    profiles: [observability]
+    networks: [nexus-net]
+    volumes:
+      - ./deploy/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./secrets/dashboard_token.txt:/etc/prometheus/token:ro
+    ports: ["127.0.0.1:9090:9090"]
+    depends_on: [dashboard]
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    profiles: [observability]
+    networks: [nexus-net]
+    environment: { GF_AUTH_ANONYMOUS_ENABLED: "false", GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/dashboard_token }
+    volumes:
+      - ./deploy/grafana:/etc/grafana/provisioning/dashboards:ro
+      - ./deploy/grafana/datasource.yml:/etc/grafana/provisioning/datasources/ds.yml:ro
+    secrets: [dashboard_token]
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on: [prometheus]
 
 networks:
   nexus-net: { driver: bridge, internal: false }
 
-volumes: { qdrant-data: {}, redis-data: {}, nexus-models: {}, nexus-ipc: {}, hsm-vault: {} }
+volumes: { ledger-data: {}, qdrant-data: {}, redis-data: {}, nexus-models: {}, nexus-ipc: {}, hsm-vault: {} }
 
 secrets:
   hsm_pin: { file: ./secrets/hsm_pin.txt }
