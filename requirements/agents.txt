@@ -1,4 +1,4 @@
-langgraph==0.0.40
+langgraph==1.2.15
 langchain-core==0.1.46
 qdrant-client==1.8.2
 redis==5.0.3
