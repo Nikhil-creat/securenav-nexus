@@ -3,174 +3,183 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#04070d">
-<title>SecureNav-NEXUS Ultimate | Nikhil Chary Sriramoju</title>
-<meta name="description" content="Zero-trust autonomous robot platform with edge AI, agentic RAG, ML intrusion detection, post-quantum hooks and a Groq-powered AI copilot. Live in-browser digital twin.">
+<meta name="theme-color" content="#08070c">
+<title>NEXUS // Autonomous Defense Console · Nikhil Chary Sriramoju</title>
+<meta name="description" content="SecureNav-NEXUS Ultimate: zero-trust autonomous robot defense console with live isometric digital twin, attack lab, Groq AI copilot and in-browser RAG.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#04070d;--card:#0a121f;--line:#143049;--cy:#00e5ff;--vi:#8b7bff;--gr:#2dffa0;--rd:#ff4d6d;--or:#ffb347;--tx:#d4f4ff;--mut:#6f9bb3}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,#0d2540 0,transparent 60%),var(--bg);color:var(--tx);font:15px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding-bottom:env(safe-area-inset-bottom)}
-a{color:var(--cy);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:1100px;margin:0 auto;padding:0 14px}
-nav{position:sticky;top:0;z-index:20;background:#04070dcc;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
-nav .wrap{display:flex;gap:14px;align-items:center;overflow-x:auto;white-space:nowrap;padding-top:10px;padding-bottom:10px;font-size:13px}
-nav b{color:var(--cy);text-shadow:0 0 10px var(--cy)}
-section{padding:34px 0 6px}h2{font-size:12px;letter-spacing:.25em;color:var(--cy);margin:0 0 14px;text-transform:uppercase}
-h2:before{content:"// ";color:var(--vi)}
-.hero{padding-top:30px}.hero h1{font-size:clamp(26px,6vw,48px);margin:0;line-height:1.1;background:linear-gradient(90deg,var(--cy),var(--vi),var(--gr));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{color:var(--mut);max-width:720px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
-.chip{border:1px solid var(--line);background:#0a1526;border-radius:99px;padding:4px 12px;font-size:12px}
-.btn{display:inline-block;border:1px solid var(--cy);color:var(--cy);background:transparent;border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}
-.btn:hover{background:#00e5ff22;text-decoration:none}.btn.red{border-color:var(--rd);color:var(--rd)}.btn.grn{border-color:var(--gr);color:var(--gr)}.btn.vi{border-color:var(--vi);color:var(--vi)}
-.btn:disabled{opacity:.35;cursor:not-allowed}
-.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}.g3{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
-.card h3{margin:0 0 6px;font-size:14px;color:var(--tx)}.mut{color:var(--mut);font-size:13px}
-canvas{width:100%;display:block;border-radius:8px;background:#050b14}
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
-.m{background:#08111d;border:1px solid var(--line);border-radius:8px;padding:8px}.m small{display:block;color:var(--mut);font-size:11px}.m span{font-size:16px}
-.ok{color:var(--gr)}.warn{color:var(--or)}.bad{color:var(--rd)}
-.row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-#log{max-height:260px;overflow:auto;font-size:12px;display:grid;gap:6px}
-#log div{border-left:3px solid var(--cy);padding:2px 8px;background:#08111d;border-radius:4px}
-#log .critical{border-color:var(--rd)}#log .high{border-color:var(--or)}#log .info{border-color:var(--vi)}
-.nodes{display:flex;flex-wrap:wrap;gap:6px}.node{font-size:11px;border:1px solid var(--line);padding:3px 8px;border-radius:6px}
-.node.ok{border-color:var(--gr)}.node.warn{border-color:var(--or);color:var(--or)}.node.bad{border-color:var(--rd);color:var(--rd)}
-#chat{display:flex;flex-direction:column;height:480px}
-#msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
-.msg{padding:8px 11px;border-radius:10px;max-width:92%;white-space:pre-wrap;word-break:break-word;font-size:13px}
-.msg.u{align-self:flex-end;background:#12335a}.msg.a{align-self:flex-start;background:#0d1d33;border:1px solid var(--line)}
-.msg .tag{display:block;font-size:10px;color:var(--vi);margin-top:4px}
-.inp{display:flex;gap:6px;margin-top:8px}
-input,select{background:#050b14;color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:9px;font:inherit;font-size:14px;min-width:0}
-.inp input{flex:1}
-details{margin-bottom:8px}summary{cursor:pointer;color:var(--vi);font-size:13px}
-.cert{font-size:12px;padding:3px 0;border-bottom:1px dashed #12324a}
-.tag2{font-size:10px;border:1px solid var(--vi);color:var(--vi);border-radius:5px;padding:0 5px;margin-left:6px}
-pre{background:#050b14;border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;font-size:11.5px}
-footer{padding:30px 0 40px;color:var(--mut);font-size:12px;text-align:center}
-@media(prefers-reduced-motion:no-preference){.pulse{animation:p 1.2s infinite}@keyframes p{50%{opacity:.4}}}
+:root{--ink:#08070c;--or:#ff5a1f;--li:#c6ff3d;--mg:#ff2e88;--ice:#eaf2ff;--mut:#8a8499;--gl:rgba(255,255,255,.045);--bd:rgba(255,255,255,.1);
+--disp:"Space Grotesk",ui-sans-serif,system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--ink);color:var(--ice);font:14px/1.5 var(--mono)}
+body{min-height:100dvh;background:radial-gradient(900px 500px at 15% -10%,#2a1208 0,transparent 60%),radial-gradient(700px 500px at 100% 0,#1c0a22 0,transparent 55%),var(--ink);padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px);z-index:50}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;opacity:0;box-shadow:inset 0 0 140px 20px var(--mg)}
+body.alarm:after{animation:alarm 1.4s ease-out}@keyframes alarm{0%{opacity:.9}100%{opacity:0}}
+a{color:var(--li);text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+#boot{position:fixed;inset:0;background:#050409;z-index:100;display:flex;align-items:center;padding:24px;transition:opacity .6s,visibility .6s}
+#boot.gone{opacity:0;visibility:hidden}#bootlog{margin:0;color:var(--li);font-size:13px;line-height:1.9;white-space:pre-wrap}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;background:linear-gradient(#08070cf2,#08070c99);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd)}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--or);color:#000;font:700 15px var(--disp);display:grid;place-items:center;transform:rotate(-6deg);box-shadow:0 0 22px #ff5a1f88}
+.pill{font-size:11px;letter-spacing:.14em;padding:5px 11px;border-radius:99px;border:1px solid var(--bd);background:var(--gl)}
+body[data-state=armed] .pill{color:var(--li);border-color:#c6ff3d66}
+body[data-state=threat] .pill{color:#fff;background:var(--mg);border-color:var(--mg);animation:bl 1s infinite}
+body[data-state=degraded] .pill{color:var(--or);border-color:#ff5a1f77}
+@keyframes bl{50%{opacity:.55}}
+.grow{flex:1}.mini{font-size:12px;border:1px solid var(--bd);border-radius:8px;padding:5px 10px;color:var(--ice)}
+.app{max-width:1180px;margin:0 auto;padding:14px}
+.stage{position:relative;height:clamp(310px,64vw,470px);border-radius:20px;border:1px solid var(--bd);overflow:hidden;background:radial-gradient(500px 280px at 50% 62%,#2b140d 0,transparent 70%),linear-gradient(#0d0b14,#09080f)}
+.stage canvas#map{position:absolute;inset:0;width:100%;height:100%}
+.brand{position:absolute;left:14px;top:12px;pointer-events:none}
+.brand small{display:block;font-size:10px;letter-spacing:.3em;color:var(--mut)}
+.brand h1{margin:2px 0 0;font:700 clamp(20px,5.2vw,40px)/.95 var(--disp);letter-spacing:-.02em}
+.brand h1 span{color:transparent;-webkit-text-stroke:1.2px var(--or)}
+.ringwrap{position:absolute;right:12px;top:10px;text-align:center}
+.ring{--p:0;width:74px;height:74px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--or) calc(var(--p)*1%),rgba(255,255,255,.09) 0);position:relative}
+.ring:before{content:"";position:absolute;inset:7px;border-radius:50%;background:#0b0a11}
+.ring b{position:relative;font:700 17px var(--disp)}.ringwrap small{font-size:9px;letter-spacing:.2em;color:var(--mut)}
+canvas.trace{position:absolute;left:0;right:0;bottom:0;width:100%;height:54px;opacity:.9}
+.chain{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+.step{border:1px solid var(--bd);border-radius:10px;padding:8px 6px;text-align:center;font-size:10px;letter-spacing:.16em;color:var(--mut);background:var(--gl);transition:.25s}
+.step i{display:block;font:700 15px var(--disp);font-style:normal;color:#ffffff33}
+.step.on{color:#000;background:var(--or);border-color:var(--or);box-shadow:0 0 18px #ff5a1f77}.step.on i{color:#000}
+.step.on.last{background:var(--li);border-color:var(--li);box-shadow:0 0 18px #c6ff3d66}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px}
+.st{background:var(--gl);border:1px solid var(--bd);border-radius:10px;padding:7px 9px}.st small{display:block;font-size:9px;letter-spacing:.16em;color:var(--mut)}
+.st span{font:700 16px var(--disp)}.ok{color:var(--li)}.warn{color:var(--or)}.bad{color:var(--mg)}
+.nodes{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.node{font-size:10px;border:1px solid var(--bd);border-radius:6px;padding:2px 8px;color:var(--mut)}
+.node.ok{color:var(--li);border-color:#c6ff3d44}.node.warn{color:var(--or);border-color:#ff5a1f66}.node.bad{color:var(--mg);border-color:#ff2e8877}
+.pulse{animation:bl 1s infinite}
+.dock{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px;border-radius:18px;background:#120f1bdd;backdrop-filter:blur(16px);border:1px solid var(--bd);box-shadow:0 10px 40px #000a}
+.dock button{background:transparent;border:0;border-radius:12px;padding:8px 2px;color:var(--mut);font-size:10px;letter-spacing:.12em;cursor:pointer}
+.dock button b{display:block;font-size:18px;font-weight:400;line-height:1.1}
+.dock button.on{background:var(--or);color:#000}
+.panels{margin-top:12px}.panel{display:none}.panel.on{display:block;animation:in .3s}@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.card{background:var(--gl);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:12px}
+h2{margin:0 0 4px;font:700 20px var(--disp);letter-spacing:-.01em}h3{margin:0 0 6px;font:700 13px var(--disp);letter-spacing:.08em;text-transform:uppercase;color:var(--or)}
+.mut{color:var(--mut);font-size:12.5px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.tile{position:relative;text-align:left;border:1px solid var(--bd);border-radius:14px;padding:12px;background:linear-gradient(160deg,#ff2e8818,transparent);cursor:pointer;min-height:82px}
+.tile b{display:block;font:700 15px var(--disp)}.tile small{color:var(--mut);font-size:10px;letter-spacing:.1em}
+.tile:active{transform:scale(.97)}.tile:disabled{opacity:.35}.tile:before{content:"";position:absolute;right:10px;top:10px;width:8px;height:8px;border-radius:50%;background:var(--mg);box-shadow:0 0 10px var(--mg)}
+.btn{border:1px solid var(--or);color:var(--or);background:transparent;border-radius:10px;padding:9px 14px;cursor:pointer;font-size:13px}
+.btn.fill{background:var(--or);color:#000;font-weight:600}.btn.li{border-color:var(--li);color:var(--li)}.btn.mg{border-color:var(--mg);color:var(--mg)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.inp{display:flex;gap:6px;margin-top:8px}
+input,select{flex:1;min-width:0;background:#0b0a11;border:1px solid var(--bd);border-radius:10px;padding:10px;font-size:14px}
+input:focus,select:focus{outline:1px solid var(--or)}
+#log{display:grid;gap:5px;max-height:240px;overflow:auto;font-size:11.5px}
+#log div{padding:5px 9px;border-left:3px solid var(--li);background:#0b0a11;border-radius:6px}
+#log .critical{border-color:var(--mg)}#log .high{border-color:var(--or)}#log .info{border-color:#6b6580}
+#msgs{display:flex;flex-direction:column;gap:8px;height:330px;overflow:auto;padding:2px}
+.msg{padding:9px 12px;border-radius:14px;max-width:90%;white-space:pre-wrap;word-break:break-word;font-size:13px}
+.msg.u{align-self:flex-end;background:var(--or);color:#000;border-bottom-right-radius:4px}
+.msg.a{align-self:flex-start;background:#17131f;border:1px solid var(--bd);border-bottom-left-radius:4px}
+.msg .tag{display:block;margin-top:5px;font-size:9.5px;letter-spacing:.08em;color:var(--li)}
+details{border-top:1px solid var(--bd);padding:8px 0}summary{cursor:pointer;font-size:13px;color:var(--ice)}
+.cert{font-size:12px;color:var(--mut);padding:3px 0 3px 10px;border-left:2px solid #ffffff14;margin:4px 0}
+.layer{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px dashed #ffffff14}.layer i{font:700 13px var(--disp);color:var(--or);font-style:normal;min-width:24px}
+.dossier{display:flex;gap:14px;align-items:center}
+.avatar{width:64px;height:64px;border-radius:18px;background:conic-gradient(from 200deg,var(--or),var(--mg),var(--li),var(--or));display:grid;place-items:center;font:700 22px var(--disp);color:#000;flex:none}
+.counts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.counts div{background:#0b0a11;border:1px solid var(--bd);border-radius:12px;padding:10px;text-align:center}.counts b{display:block;font:700 26px var(--disp);color:var(--li)}.counts small{font-size:9.5px;letter-spacing:.12em;color:var(--mut)}
+.car{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 10px}
+.pc{flex:0 0 72%;max-width:260px;scroll-snap-align:start;border:1px solid var(--bd);border-radius:16px;padding:14px;background:linear-gradient(160deg,#ff5a1f1c,transparent 60%);color:var(--ice)}
+.pc i{font:700 30px var(--disp);color:#ffffff22;font-style:normal;display:block}.pc b{font:700 15px var(--disp);display:block;margin:2px 0 4px}
+footer{text-align:center;color:var(--mut);font-size:11px;padding:18px 0}
+@media(min-width:960px){
+ body{padding-bottom:24px}.app{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:start}
+ .stagecol{position:sticky;top:70px}.dock{position:static;box-shadow:none;margin-bottom:0;background:var(--gl)}
+ .side{min-width:0}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
-<body>
-<nav><div class="wrap"><b>NEXUS//</b><a href="#twin">Digital Twin</a><a href="#ai">AI Copilot</a><a href="#rag">RAG Search</a><a href="#arch">Architecture</a><a href="#creds">Credentials</a><a href="#proj">Projects</a></div></nav>
-
-<div class="wrap">
-<section class="hero">
-  <div class="chip" style="display:inline-block">ROS 2 · SROS2 · Edge CNN+ViT · LangGraph RAG · eBPF IDS · Post-Quantum ready</div>
-  <h1>SecureNav-NEXUS Ultimate</h1>
-  <p>A zero-trust autonomous mobile robot / drone platform that detects cyber-physical attacks in real time, fails safe, revokes compromised identities and explains itself through a Groq-powered AI copilot. Everything below runs live in your browser.</p>
-  <div class="chips" id="statChips"></div>
-  <div class="row">
-    <a class="btn" href="#twin">Launch live twin</a>
-    <a class="btn vi" href="#ai">Talk to NEXUS-AI</a>
-    <a class="btn grn" id="ghLink" target="_blank" rel="noopener">GitHub</a>
-    <a class="btn" id="liLink" target="_blank" rel="noopener">LinkedIn</a>
-    <a class="btn" id="mailLink">Email</a>
+<body data-state="learning">
+<div id="boot"><pre id="bootlog"></pre></div>
+<header class="top"><div class="logo">NX</div><span class="pill" id="pill">LEARNING</span><span class="grow"></span><a class="mini" id="ghLink" target="_blank" rel="noopener">GitHub ↗</a></header>
+<main class="app">
+<section class="stagecol">
+  <div class="stage">
+    <canvas id="map"></canvas>
+    <div class="brand"><small>ZERO-TRUST AUTONOMY</small><h1>SECURENAV<br><span>NEXUS</span></h1></div>
+    <div class="ringwrap"><div class="ring" id="ring"><b id="mScore">0.00</b></div><small>ANOMALY</small></div>
+    <canvas id="chart" class="trace"></canvas>
   </div>
-  <p class="mut">Built by <b id="whoami"></b>.</p>
+  <div class="chain" id="chain"><div class="step" id="c0"><i>01</i>DETECT</div><div class="step" id="c1"><i>02</i>CONTAIN</div><div class="step" id="c2"><i>03</i>ADAPT</div><div class="step last" id="c3"><i>04</i>RECOVER</div></div>
+  <div class="stats">
+    <div class="st"><small>CMD_VEL HZ</small><span id="mCmd">0</span></div>
+    <div class="st"><small>SPEED CAP</small><span id="mCap">1.0</span></div>
+    <div class="st"><small>E-STOP</small><span id="mStop" class="ok">OFF</span></div>
+    <div class="st"><small>PROFILE</small><span id="mProf" style="font-size:12px">nominal</span></div>
+    <div class="st"><small>FUSION C/L/O</small><span id="mFus" style="font-size:13px">.4/.4/.2</span></div>
+  </div>
+  <div class="nodes" id="nodes"></div>
 </section>
 
-<section id="twin">
-  <h2>Live digital twin &amp; attack lab</h2>
-  <div class="grid g2" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
-    <div class="card">
-      <canvas id="map"></canvas>
-      <div class="metrics">
-        <div class="m"><small>ANOMALY SCORE</small><span id="mScore">0.00</span></div>
-        <div class="m"><small>/cmd_vel Hz</small><span id="mCmd">0</span></div>
-        <div class="m"><small>SPEED CAP m/s</small><span id="mCap">1.0</span></div>
-        <div class="m"><small>E-STOP</small><span id="mStop" class="ok">RELEASED</span></div>
-        <div class="m"><small>PROFILE</small><span id="mProf">nominal</span></div>
-        <div class="m"><small>FUSION cam/lidar/odom</small><span id="mFus">.4/.4/.2</span></div>
-      </div>
-      <div class="nodes" id="nodes" style="margin-top:10px"></div>
+<section class="side">
+ <nav class="dock" id="dock">
+  <button class="on" data-tab="defend"><b>◈</b>DEFEND</button><button data-tab="ai"><b>✦</b>COPILOT</button>
+  <button data-tab="intel"><b>⌖</b>INTEL</button><button data-tab="op"><b>☰</b>OPERATOR</button>
+ </nav>
+ <div class="panels">
+  <div class="panel on" id="p-defend">
+   <div class="card"><h2>Attack lab</h2><div class="mut">IDS status: <b id="ready" style="color:var(--li)">learning baseline 0/12</b>. Launch a simulated cyber-physical attack and watch detect → contain → adapt → recover.</div>
+    <div class="tiles">
+     <button class="tile atk" data-a="dos" disabled><b>DoS flood</b><small>T0814 · /cmd_vel</small></button>
+     <button class="tile atk" data-a="rogue" disabled><b>Rogue node</b><small>T0855 · unauth cmd</small></button>
+     <button class="tile atk" data-a="spoof" disabled><b>Camera spoof</b><small>T0856 · ghost objects</small></button>
+     <button class="tile atk" data-a="gps" disabled><b>GPS denial</b><small>T0856 · odom jump</small></button>
     </div>
-    <div class="card">
-      <h3>Adversarial attack lab <span class="tag2" id="ready">learning baseline…</span></h3>
-      <div class="mut">The in-browser IDS learns a clean baseline for ~12 s, then you can attack the robot. Mirrors the Python IDS: z-score + hard rules, e-stop first, HSM revocation, self-healing playbooks.</div>
-      <div class="row">
-        <button class="btn red atk" data-a="dos" disabled>DoS flood</button>
-        <button class="btn red atk" data-a="rogue" disabled>Rogue /cmd_vel</button>
-        <button class="btn red atk" data-a="spoof" disabled>Camera spoof</button>
-        <button class="btn red atk" data-a="gps" disabled>GPS denial</button>
-      </div>
-      <div class="row">
-        <button class="btn grn" id="release">Release e-stop (operator)</button>
-        <button class="btn" id="estopBtn">Engage e-stop</button>
-      </div>
-      <canvas id="chart" style="height:110px"></canvas>
-      <h3 style="margin-top:10px">Threat &amp; response log</h3>
-      <div id="log"></div>
-    </div>
+    <div class="row"><button class="btn mg" id="estopBtn">Engage e-stop</button><button class="btn li" id="release">Release e-stop (human)</button></div>
+   </div>
+   <div class="card"><h3>Mission planner</h3><div class="mut">Natural language → Nav2-style waypoints</div>
+    <div class="inp"><input id="mission" value="go to (25,4) then patrol south 8 m then (5,14) at 0.8 m/s" aria-label="mission"><button class="btn fill" id="planBtn">Plan</button></div></div>
+   <div class="card"><h3>Response log</h3><div id="log"></div></div>
   </div>
-  <div class="card" style="margin-top:12px">
-    <h3>Mission planner (natural language → waypoints)</h3>
-    <div class="inp"><input id="mission" value="go to (25,4) then patrol south 8 m then (5,14) at 0.8 m/s" aria-label="mission directive"><button class="btn" id="planBtn">Plan</button></div>
+
+  <div class="panel" id="p-ai">
+   <div class="card"><h2>NEXUS-AI</h2><div class="mut">Agentic copilot with tools: telemetry, threats, RAG, mission planning, attack sim, e-stop (engage only). <span id="aiMode">mode: offline</span></div>
+    <div id="msgs" style="margin-top:10px"></div><div class="row" id="quick"></div>
+    <div class="inp"><button class="btn" id="mic" title="voice">🎙</button><input id="chatIn" placeholder="Ask or command…" aria-label="chat"><button class="btn fill" id="send">Send</button></div>
+    <label class="mut" style="display:block;margin-top:8px"><input type="checkbox" id="tts" style="flex:none;width:auto"> speak replies</label></div>
+   <div class="card"><details><summary>Connect free Groq key</summary>
+    <p class="mut">Key from <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>. Stays in this browser only and goes only to api.groq.com. Never commit it.</p>
+    <div class="inp"><input id="key" type="password" placeholder="gsk_…" autocomplete="off"><button class="btn li" id="saveKey">Save</button><button class="btn" id="clearKey">Clear</button></div>
+    <div class="inp"><select id="model"><option>llama-3.3-70b-versatile</option><option>llama-3.1-8b-instant</option></select></div></details></div>
   </div>
-</section>
 
-<section id="ai">
-  <h2>NEXUS-AI copilot · Groq</h2>
-  <div class="grid g2" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
-    <div class="card" id="chat">
-      <div id="msgs"></div>
-      <div class="row" id="quick"></div>
-      <div class="inp"><button class="btn" id="mic" title="Voice input">🎙</button><input id="chatIn" placeholder="Ask NEXUS-AI or give a command…" aria-label="chat input"><button class="btn vi" id="send">Send</button></div>
-    </div>
-    <div class="card">
-      <h3>Connect your free Groq key</h3>
-      <p class="mut">Get a free key at <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>. It is stored only in this browser (localStorage) and sent only to api.groq.com. Never commit it to GitHub. Use a key you can revoke.</p>
-      <div class="inp"><input id="key" type="password" placeholder="gsk_..." autocomplete="off"><button class="btn grn" id="saveKey">Save</button><button class="btn" id="clearKey">Clear</button></div>
-      <div class="inp"><select id="model"><option>llama-3.3-70b-versatile</option><option>llama-3.1-8b-instant</option></select></div>
-      <div class="row"><label class="mut"><input type="checkbox" id="tts"> speak replies</label><span class="mut" id="aiMode">mode: offline</span></div>
-      <p class="mut">Agentic tool use: the model can read live telemetry, list threats, search the RAG knowledge base, plan missions, launch simulated attacks and engage the e-stop. It can never release the e-stop; that stays a human action. Without a key an offline rule-based copilot answers.</p>
-    </div>
+  <div class="panel" id="p-intel">
+   <div class="card"><h2>Threat intel · RAG</h2><div class="mut">In-browser vector search over MITRE ATT&amp;CK for ICS, NIST 800-82, ISO/SAE 21434 and playbooks.</div>
+    <div class="inp"><input id="q" placeholder="rogue node publishing cmd_vel" aria-label="query"><button class="btn fill" id="qBtn">Search</button></div><div id="hits" style="margin-top:10px"></div></div>
+   <div class="card"><h2>10 integrated layers</h2>
+    <div class="layer"><i>01</i><span>Docker edge orchestration · CUDA / TensorRT</span></div>
+    <div class="layer"><i>02</i><span>CNN + ViT perception · ONNX / TRT FP16 INT8</span></div>
+    <div class="layer"><i>03</i><span>LangGraph agents · Qdrant RAG · Redis state</span></div>
+    <div class="layer"><i>04</i><span>SROS2 zero trust · signed governance · topic ACLs</span></div>
+    <div class="layer"><i>05</i><span>ML IDS · IsoForest + autoencoder + eBPF</span></div>
+    <div class="layer"><i>06</i><span>Gazebo / Isaac digital twin · fault injection</span></div>
+    <div class="layer"><i>07</i><span>FastAPI WebSocket observability hub</span></div>
+    <div class="layer"><i>08</i><span>CI/CD · Bandit · MyPy · Trivy</span></div>
+    <div class="layer"><i>09</i><span>NEXUS-AI Groq copilot · tool calling</span></div>
+    <div class="layer"><i>10</i><span>HSM emulator · Ed25519 + Dilithium3 hybrid</span></div></div>
   </div>
-</section>
 
-<section id="rag">
-  <h2>Threat-knowledge RAG search (in-browser vector search)</h2>
-  <div class="card"><div class="inp"><input id="q" placeholder="e.g. rogue node publishing cmd_vel" aria-label="knowledge query"><button class="btn" id="qBtn">Search</button></div><div id="hits" style="margin-top:10px"></div>
-  <p class="mut">Hashed-embedding cosine search over MITRE ATT&amp;CK for ICS, NIST 800-82, ISO/SAE 21434 summaries and playbooks. The production stack uses Qdrant for the same flow.</p></div>
-</section>
-
-<section id="arch">
-  <h2>Architecture</h2>
-<pre>
- sensors / Gazebo ─► ros2-core (Nav2 + SROS2) ◄══ DDS ENCRYPT ══► sec-ids-guardian (IsoForest+AE+rules+eBPF)
-   camera · lidar         │ /cmd_vel                                   │ /sys/e_stop · /security/alerts
-        │                 ▼                                            ▼
-        └─► vision-perception (CNN+ViT, TRT/ONNX) ─► /perception/*   hsm-emulator (Ed25519 + Dilithium3)
-                                │                                      ▲ revoke
-                         agentic-rag-core (LangGraph: Planner · Audit · Self-Heal) ─ Qdrant · Redis
-                                │
-                       dashboard (FastAPI WS) ─ NEXUS-AI copilot (Groq tool-calling)
-</pre>
-  <div class="grid g3">
-    <div class="card"><h3>Zero-trust</h3><div class="mut">SROS2 enclaves, signed governance, topic ACLs, encrypted discovery, least-privilege publishers.</div></div>
-    <div class="card"><h3>Edge AI</h3><div class="mut">PyTorch CNN+ViT for segmentation, depth and spoof detection; ONNX / TensorRT FP16 &amp; INT8 export for Jetson Orin.</div></div>
-    <div class="card"><h3>Agentic RAG</h3><div class="mut">LangGraph agents triage with a Qdrant knowledge base; LLM may only escalate severity, never downgrade rule-based critical.</div></div>
-    <div class="card"><h3>Intrusion defense</h3><div class="mut">Isolation Forest + autoencoder + hard rules + eBPF syscall audit; e-stop before analysis.</div></div>
-    <div class="card"><h3>Post-quantum ready</h3><div class="mut">Hybrid Ed25519 + CRYSTALS-Dilithium3 signing hook, signed certificate revocations.</div></div>
-    <div class="card"><h3>Human in the loop</h3><div class="mut">Operator override console; the AI can stop the robot but only a human can release it.</div></div>
+  <div class="panel" id="p-op">
+   <div class="card"><div class="dossier"><div class="avatar">NC</div><div><h2 id="dossName"></h2><div class="mut" id="dossRole"></div></div></div>
+    <div class="row"><a class="btn li" id="ghLink2" target="_blank" rel="noopener">GitHub</a><a class="btn" id="liLink" target="_blank" rel="noopener">LinkedIn</a><a class="btn" id="mailLink">Email</a></div>
+    <div class="counts"><div><b id="cntCerts">0</b><small>CERTS &amp; SIMS</small></div><div><b id="cntProj">0</b><small>PROJECTS</small></div><div><b>10</b><small>PLATFORM LAYERS</small></div></div>
+    <div id="certs"></div></div>
+   <div class="card"><h3>Other builds</h3><div class="car" id="projects"></div></div>
   </div>
+ </div>
 </section>
-
-<section id="creds">
-  <h2>Credentials</h2>
-  <div class="card"><h3 id="credName"></h3><div class="mut" id="credRole"></div><div id="certs" style="margin-top:10px"></div></div>
-</section>
-
-<section id="proj">
-  <h2>More projects by the author</h2>
-  <div class="grid g3" id="projects"></div>
-</section>
-<footer>SecureNav-NEXUS Ultimate · simulation demo, not a certified safety system · © <span id="yr"></span> <span id="foot"></span></footer>
-</div>
-
+</main>
+<footer>NEXUS simulation console · not a certified safety system · © <span id="yr"></span> Nikhil Chary Sriramoju</footer>
 <script>
+"use strict";
+
 "use strict";
 /* ============================== profile & credentials data ============================== */
 const ME={name:"Nikhil Chary Sriramoju",role:"BTech CSE (final year) · AI security, agentic systems & cyber-physical engineering",
@@ -184,14 +193,13 @@ const CERTS={
 const PROJECTS=[["BastionMesh AI","Multi-agent mesh: CNN vision, CRAG, MCP tools, Raft-style consensus"],["APEX-AI","Agentic multimodal assistant: Groq, LangGraph, GraphRAG, 6 Docker services"],["VigilAI Engine Mesh","vLLM + agentic RAG + CNN vision + QoS gateway + Prometheus/Grafana"],["EcoGrid-AI","Self-healing decentralized microgrid sentinel"],["PharmAi Vision","Pill identifier + agentic assistant (CNN+ViT, OCR, GraphRAG)"],["StreamGuard","Real-time fraud pipeline: Kafka, Airflow, dbt, Delta Lake"],["OptiMarket X","Multi-agent AI commerce mesh for D2C brands"],["LLMOps Nexus","Semantic caching layer for LLM APIs"],["Raft KV Store","Distributed key-value store with AI anomaly detection"],["AD-CSF","Autonomous distributed cognitive security fabric (PQC + zero trust)"],["Aether Screenshot Studio","CNN + RAG self-healing screenshot editor"],["Medha","Agentic looping assistant, coder and researcher"]];
 const $=s=>document.querySelector(s), el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e};
 (function profile(){
- $("#ghLink").href=ME.github;$("#liLink").href=ME.linkedin;$("#mailLink").href="mailto:"+ME.email;$("#whoami").textContent=ME.name;
- $("#credName").textContent=ME.name;$("#credRole").textContent=ME.role;$("#foot").textContent=ME.name;$("#yr").textContent=new Date().getFullYear();
+ $("#ghLink").href=ME.github;$("#ghLink2").href=ME.github;$("#liLink").href=ME.linkedin;$("#mailLink").href="mailto:"+ME.email;
+ $("#dossName").textContent=ME.name;$("#dossRole").textContent=ME.role;$("#yr").textContent=new Date().getFullYear();
  let total=0;const box=$("#certs");
- for(const [grp,items] of Object.entries(CERTS)){total+=items.length;const d=document.createElement("details");d.open=grp.startsWith("Forage");d.appendChild(el("summary","",grp+" ("+items.length+")"));items.forEach(i=>d.appendChild(el("div","cert",i)));box.appendChild(d)}
- const sc=$("#statChips");[total+" certifications & simulations",PROJECTS.length+"+ AI/security projects","10 integrated platform layers","Groq-powered copilot"].forEach(t=>sc.appendChild(el("span","chip",t)));
- const pg=$("#projects");PROJECTS.forEach(([n,d])=>{const c=el("a","card");c.href=ME.github+"?tab=repositories";c.target="_blank";c.rel="noopener";c.appendChild(el("h3","",n));c.appendChild(el("div","mut",d));pg.appendChild(c)});
+ for(const [grp,items] of Object.entries(CERTS)){total+=items.length;const d=document.createElement("details");d.open=grp.startsWith("Forage");d.appendChild(el("summary","",grp+"  ("+items.length+")"));items.forEach(i=>d.appendChild(el("div","cert",i)));box.appendChild(d)}
+ const up=(id,n)=>{const e=$(id);let i=0;const t=setInterval(()=>{i++;e.textContent=i;if(i>=n)clearInterval(t)},40)};up("#cntCerts",total);up("#cntProj",PROJECTS.length);
+ const pg=$("#projects");PROJECTS.forEach(([n,d],k)=>{const c=el("a","pc");c.href=ME.github+"?tab=repositories";c.target="_blank";c.rel="noopener";c.appendChild(el("i","",String(k+1).padStart(2,"0")));c.appendChild(el("b","",n));c.appendChild(el("div","mut",d));pg.appendChild(c)});
 })();
-
 /* ============================== world + physics ============================== */
 const W=30,H=18,TS=2;
 const OBST=[{x:10,y:6,r:1.6},{x:18,y:12,r:2},{x:23,y:5,r:1.3},{x:7,y:13,r:1.2}];
@@ -213,25 +221,52 @@ function physics(dt){const r=S.robot;S.rays=[];let front=9,left=9,right=9;
  r.x=clamp(r.x+Math.cos(r.th)*v*dt,.3,W-.3);r.y=clamp(r.y+Math.sin(r.th)*v*dt,.3,H-.3);
  if(!S.trail.length||Math.hypot(r.x-S.trail.at(-1)[0],r.y-S.trail.at(-1)[1])>.3){S.trail.push([r.x,r.y]);if(S.trail.length>120)S.trail.shift()}}
 
-/* ============================== rendering ============================== */
-const cv=$("#map"),cx=cv.getContext("2d");let sc=1;
-function fit(c,ratio){const dpr=window.devicePixelRatio||1,w=c.clientWidth;c.width=w*dpr;c.height=(ratio?w*ratio:c.clientHeight)*dpr;if(ratio)c.style.height=(w*ratio)+"px";return dpr}
-function drawMap(){const dpr=fit(cv,H/W);sc=cv.width/W;const g=cx;g.clearRect(0,0,cv.width,cv.height);
- g.strokeStyle="#0f2a40";g.lineWidth=1;for(let i=0;i<=W;i+=2){g.beginPath();g.moveTo(i*sc,0);g.lineTo(i*sc,cv.height);g.stroke()}for(let j=0;j<=H;j+=2){g.beginPath();g.moveTo(0,j*sc);g.lineTo(cv.width,j*sc);g.stroke()}
- g.fillStyle="#12304a";g.strokeStyle="#2a6c9a";OBST.forEach(o=>{g.beginPath();g.arc(o.x*sc,o.y*sc,o.r*sc,0,7);g.fill();g.stroke()});
- const r=S.robot;g.strokeStyle="rgba(0,229,255,.22)";S.rays.forEach(([a,d])=>{g.beginPath();g.moveTo(r.x*sc,r.y*sc);g.lineTo((r.x+Math.cos(a)*d)*sc,(r.y+Math.sin(a)*d)*sc);g.stroke()});
- g.strokeStyle="rgba(45,255,160,.5)";g.beginPath();S.trail.forEach((p,i)=>i?g.lineTo(p[0]*sc,p[1]*sc):g.moveTo(p[0]*sc,p[1]*sc));g.stroke();
- g.fillStyle="#8b7bff";S.wps.forEach((w,i)=>{g.beginPath();g.arc(w.x*sc,w.y*sc,(i===S.wi?5:3)*dpr,0,7);g.fill()});
- if(S.attacks.spoof&&!S.attacks.spoof.isolated){g.strokeStyle="#ff4d6d";g.setLineDash([6,4]);for(let i=0;i<3;i++){const x=(8+((Date.now()/300+i*7)%14))*sc,y=(3+i*5)*sc;g.strokeRect(x,y,2.2*sc,2.2*sc);g.fillStyle="#ff4d6d";g.font=(11*dpr)+"px monospace";g.fillText("ghost?",x,y-4)}g.setLineDash([])}
- if(S.attacks.gps&&!S.attacks.gps.isolated){g.strokeStyle="#ffb347";g.beginPath();g.arc((r.x+S.drift.x)*sc,(r.y+S.drift.y)*sc,10*dpr,0,7);g.stroke()}
- if(S.attacks.dos&&!S.attacks.dos.isolated){g.fillStyle="#ff4d6d";for(let i=0;i<40;i++){g.fillRect(Math.random()*cv.width,Math.random()*cv.height,2*dpr,2*dpr)}}
- g.save();g.translate(r.x*sc,r.y*sc);g.rotate(r.th);g.fillStyle=S.estop?"#ff4d6d":"#00e5ff";g.shadowColor=g.fillStyle;g.shadowBlur=14;g.beginPath();g.moveTo(14*dpr,0);g.lineTo(-9*dpr,8*dpr);g.lineTo(-9*dpr,-8*dpr);g.closePath();g.fill();g.restore();
- if(S.estop){g.strokeStyle="#ff4d6d";g.lineWidth=4*dpr;g.strokeRect(0,0,cv.width,cv.height);g.lineWidth=1}}
-const chv=$("#chart"),cc=chv.getContext("2d");
-function drawChart(){fit(chv);const g=cc,w=chv.width,h=chv.height;g.clearRect(0,0,w,h);
- const line=(arr,col,max)=>{g.strokeStyle=col;g.beginPath();arr.forEach((v,i)=>{const x=i/59*w,y=h-clamp(v/max,0,1)*(h-8)-4;i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()};
- line(S.series.score,"#00e5ff",1);line(S.series.cmd,"#ffb347",Math.max(30,...S.series.cmd));g.fillStyle="#6f9bb3";g.font=(10*(window.devicePixelRatio||1))+"px monospace";g.fillText("score (cyan) · cmd_vel Hz (amber)",6,12)}
-
+/* ============================== isometric 3D renderer ============================== */
+const cv=$("#map"),cx=cv.getContext("2d");let DPR=1,SC=1,OX=0,OY=0,CW=0,CH=0;
+const OH=[2.2,3,1.8,1.6];S.chain=[0,0,0,0];
+function sizeCanvas(c){DPR=Math.min(window.devicePixelRatio||1,2);const w=c.clientWidth,h=c.clientHeight;if(c.width!==Math.round(w*DPR)||c.height!==Math.round(h*DPR)){c.width=Math.round(w*DPR);c.height=Math.round(h*DPR)}return [w,h]}
+function layout(w,h){const zmax=3.2;SC=Math.min(w/((W+H)*.866+1.5),(h-64)/((W+H)*.5+zmax));OX=w/2-(W-H)/2*.866*SC;OY=(h-54-((W+H)*.5*SC+zmax*SC))/2+zmax*SC+14}
+const P=(x,y,z=0)=>[OX+(x-y)*.866*SC,OY+(x+y)*.5*SC-z*SC];
+function circ(x,y,r,n=22){const a=[];for(let i=0;i<n;i++){const t=i/n*Math.PI*2;a.push([x+Math.cos(t)*r,y+Math.sin(t)*r])}return a}
+function path(pts,z,close){cx.beginPath();pts.forEach((p,i)=>{const q=P(p[0],p[1],z);i?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1])});if(close)cx.closePath()}
+function prism(pts,z0,z1,top,side,edge,alpha=1){const n=pts.length,q=[];for(let i=0;i<n;i++){const a=pts[i],b=pts[(i+1)%n];q.push({a,b,d:(a[0]+a[1]+b[0]+b[1])/2})}
+ q.sort((u,v)=>u.d-v.d);const g=cx;g.globalAlpha=alpha;
+ q.forEach(e=>{const ang=Math.atan2(e.b[1]-e.a[1],e.b[0]-e.a[0]),sh=.35+.45*Math.abs(Math.cos(ang-.6));
+  const p=[P(e.a[0],e.a[1],z0),P(e.b[0],e.b[1],z0),P(e.b[0],e.b[1],z1),P(e.a[0],e.a[1],z1)];g.beginPath();p.forEach((c,k)=>k?g.lineTo(c[0],c[1]):g.moveTo(c[0],c[1]));g.closePath();g.fillStyle="rgba("+side+","+sh+")";g.fill();if(edge){g.strokeStyle=edge;g.lineWidth=1;g.stroke()}});
+ path(pts,z1,true);g.fillStyle=top;g.fill();if(edge){g.strokeStyle=edge;g.stroke()}g.globalAlpha=1}
+const live=n=>S.attacks[n]&&!S.attacks[n].isolated;
+function drawMap(t){const [w,h]=sizeCanvas(cv);CW=w;CH=h;layout(w,h);const g=cx;g.setTransform(DPR,0,0,DPR,0,0);g.clearRect(0,0,w,h);
+ /* floor */
+ path([[0,0],[W,0],[W,H],[0,H]],0,true);const fg=g.createLinearGradient(0,OY,0,OY+(W+H)*.5*SC);fg.addColorStop(0,"#1a1120");fg.addColorStop(1,"#0d0a14");g.fillStyle=fg;g.fill();g.strokeStyle="rgba(255,90,31,.55)";g.lineWidth=1.5;g.stroke();
+ g.lineWidth=1;g.strokeStyle="rgba(255,255,255,.06)";for(let i=2;i<W;i+=2){path([[i,0],[i,H]],0);g.stroke()}for(let j=2;j<H;j+=2){path([[0,j],[W,j]],0);g.stroke()}
+ const r=S.robot;
+ /* sonar pulse */
+ const ph=(t/1400)%1;path(circ(r.x,r.y,ph*7,36),0,true);g.strokeStyle="rgba(255,90,31,"+(.5*(1-ph))+")";g.lineWidth=1.5;g.stroke();
+ /* lidar */
+ g.lineWidth=1;S.rays.forEach(([a,d])=>{const e=[r.x+Math.cos(a)*d,r.y+Math.sin(a)*d];path([[r.x,r.y],e],.03);g.strokeStyle="rgba(255,90,31,.22)";g.stroke();if(d<6.9){const q=P(e[0],e[1],.03);g.fillStyle="#c6ff3d";g.fillRect(q[0]-1.5,q[1]-1.5,3,3)}});
+ /* route */
+ if(S.wps.length){const pts=[[r.x,r.y],...S.wps.slice(S.wi).map(p=>[p.x,p.y])];path(pts,.04);g.setLineDash([6,5]);g.strokeStyle="rgba(198,255,61,.8)";g.lineWidth=1.5;g.stroke();g.setLineDash([]);
+  S.wps.forEach((wp,i)=>{const a=P(wp.x,wp.y,0),b=P(wp.x,wp.y,i===S.wi?1.6:.9);g.strokeStyle=i===S.wi?"#c6ff3d":"rgba(198,255,61,.35)";g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();g.fillStyle=g.strokeStyle;g.beginPath();g.arc(b[0],b[1],i===S.wi?4:2.5,0,7);g.fill()})}
+ /* trail */
+ if(S.trail.length>1){for(let i=1;i<S.trail.length;i++){path([S.trail[i-1],S.trail[i]],.02);g.strokeStyle="rgba(255,90,31,"+(i/S.trail.length*.7)+")";g.lineWidth=2;g.stroke()}g.lineWidth=1}
+ /* depth-sorted solids */
+ const items=[];OBST.forEach((o,i)=>items.push({d:o.x+o.y,f:()=>prism(circ(o.x,o.y,o.r,18),0,OH[i%OH.length],"rgba(70,48,86,.95)","120,90,150","rgba(200,170,255,.35)")}));
+ const corners=[[.55,.38],[.55,-.38],[-.55,-.38],[-.55,.38]].map(([a,b])=>[r.x+a*Math.cos(r.th)-b*Math.sin(r.th),r.y+a*Math.sin(r.th)+b*Math.cos(r.th)]);
+ items.push({d:r.x+r.y+.01,f:()=>{path(circ(r.x,r.y,.9,16),0,true);g.fillStyle="rgba(0,0,0,.45)";g.fill();
+   const col=S.estop?"#ff2e88":"#ff5a1f";prism(corners,.25,.8,col,S.estop?"255,46,136":"255,90,31","rgba(255,255,255,.55)");
+   const nose=P(r.x+Math.cos(r.th)*.9,r.y+Math.sin(r.th)*.9,.55),c0=P(r.x,r.y,.55);g.strokeStyle="#c6ff3d";g.lineWidth=2;g.beginPath();g.moveTo(c0[0],c0[1]);g.lineTo(nose[0],nose[1]);g.stroke();g.lineWidth=1;
+   const rot=t/90;for(let k=0;k<4;k++){const a=rot+k*Math.PI/2,q=P(r.x+Math.cos(a)*.7,r.y+Math.sin(a)*.7,1);g.fillStyle="rgba(255,255,255,.35)";g.beginPath();g.arc(q[0],q[1],2,0,7);g.fill()}}});
+ if(live("rogue"))items.push({d:W-4+3,f:()=>{prism([[W-4.4,2.6],[W-3.6,2.6],[W-3.6,3.4],[W-4.4,3.4]],0,1.4,"#ff2e88","255,46,136","#fff");const a=P(W-4,3,1.4),b=P(r.x,r.y,.8);g.setLineDash([4,4]);g.strokeStyle="#ff2e88";g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();g.setLineDash([]);g.fillStyle="#ff2e88";g.font="10px monospace";g.fillText("ROGUE",a[0]-16,a[1]-8)}});
+ if(S.attacks.rogue&&S.attacks.rogue.isolated&&S.revoked.length)items.push({d:W-1,f:()=>prism([[W-4.4,2.6],[W-3.6,2.6],[W-3.6,3.4],[W-4.4,3.4]],0,.5,"rgba(90,90,100,.6)","90,90,100","rgba(255,255,255,.2)",.6)});
+ if(live("spoof"))for(let i=0;i<3;i++){const gx=8+((t/400+i*7)%14),gy=3+i*5;items.push({d:gx+gy,f:()=>prism(circ(gx,gy,1,6),0,1.8,"rgba(255,46,136,.15)","255,46,136","#ff2e88",.3+.5*Math.abs(Math.sin(t/130+i)))})}
+ items.sort((a,b)=>a.d-b.d).forEach(i=>i.f());
+ /* attack overlays */
+ if(live("dos"))for(let i=0;i<22;i++){const ph2=((t/650)+i/22)%1,ang=i*.62,d0=14*(1-ph2),px=r.x+Math.cos(ang)*d0,py=r.y+Math.sin(ang)*d0;const a=P(px,py,.7),b=P(px+Math.cos(ang)*.9,py+Math.sin(ang)*.9,.7);g.strokeStyle="rgba(255,46,136,"+(.3+.6*ph2)+")";g.lineWidth=2;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke()}
+ if(live("gps")){const gx=clamp(r.x+S.drift.x,.5,W-.5),gy=clamp(r.y+S.drift.y,.5,H-.5);path(circ(gx,gy,.8,14),.8,true);g.strokeStyle="#ffb347";g.setLineDash([3,3]);g.stroke();g.setLineDash([]);const a=P(r.x,r.y,.8),b=P(gx,gy,.8);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();const q=P(gx,gy,1.3);g.fillStyle="#ffb347";g.font="10px monospace";g.fillText("FALSE FIX",q[0]-26,q[1])}
+ if(S.estop){const k=.5+.5*Math.sin(t/160);path(circ(r.x,r.y,1.6+k*.5,30),.05,true);g.strokeStyle="rgba(255,46,136,"+(.5+.5*k)+")";g.lineWidth=3;g.stroke();g.lineWidth=1}}
+function drawChart(){const c=$("#chart"),[w,h]=sizeCanvas(c),g=c.getContext("2d");g.setTransform(DPR,0,0,DPR,0,0);g.clearRect(0,0,w,h);
+ const line=(arr,col,max,fill)=>{if(arr.length<2)return;g.beginPath();arr.forEach((v,i)=>{const x=i/59*w,y=h-clamp(v/max,0,1)*(h-10)-3;i?g.lineTo(x,y):g.moveTo(x,y)});g.strokeStyle=col;g.lineWidth=1.6;g.stroke();if(fill){g.lineTo((arr.length-1)/59*w,h);g.lineTo(0,h);g.closePath();g.fillStyle=fill;g.fill()}};
+ line(S.series.cmd,"rgba(198,255,61,.7)",Math.max(30,...S.series.cmd));line(S.series.score,"#ff5a1f",1,"rgba(255,90,31,.15)")}
 /* ============================== IDS (mirrors the Python engine) ============================== */
 const FEATS=["cmdHz","odomHz","camHz","cpu","visAnom","odomJump","rogue"];
 function sample(){const a=S.attacks,live=n=>a[n]&&!a[n].isolated;
@@ -253,7 +288,7 @@ async function respond(d){if(!d.reasons.length)return;const key=d.reasons.join("
  else if(d.pb==="PB-02"){S.fusion={cam:.1,lidar:.7,odom:.2};S.cap=.3;S.profile="sensor_distrust";acts.push("camera fusion weight → 0.1","speed cap 0.3 m/s");if(S.attacks.spoof)S.attacks.spoof.isolated=true}
  else if(d.pb==="PB-04"){S.cap=.5;S.profile="lidar_odometry";acts.push("localization → LiDAR odom","speed cap 0.5 m/s");if(S.attacks.gps)S.attacks.gps.isolated=true;S.drift={x:0,y:0}}
  else acts.push("flagged for review");
- log(d.sev,d.reasons.join(" | ")+(d.pb?" ["+d.pb+"]":""),acts.join("; "))}
+ log(d.sev,d.reasons.join(" | ")+(d.pb?" ["+d.pb+"]":""),acts.join("; "));incident(d.sev)}
 async function idsTick(){S.ticks++;const v=sample();S.cmdHz=v[0];
  if(!S.ready){S.base.push(v);if(S.base.length>=12){S.mean=FEATS.map((_,i)=>S.base.reduce((s,r)=>s+r[i],0)/S.base.length);S.std=FEATS.map((_,i)=>{const m=S.mean[i],sd=Math.sqrt(S.base.reduce((s,r)=>s+(r[i]-m)**2,0)/S.base.length);return Math.max(sd,.05*Math.abs(m),.02)});S.ready=true;
    $("#ready").textContent="baseline ready";$("#ready").className="tag2 ok";document.querySelectorAll(".atk").forEach(b=>b.disabled=false);log("info","baseline learned from 12 clean windows; IDS armed")}
@@ -262,15 +297,21 @@ async function idsTick(){S.ticks++;const v=sample();S.cmdHz=v[0];
  for(const [n,a] of Object.entries(S.attacks)){if(Date.now()-a.t0>10000){delete S.attacks[n];log("info","attack '"+n+"' ended")}}
  if(S.attacks.gps&&!S.attacks.gps.isolated){S.drift.x+=1.5;S.drift.y-=.8}
  const live=Object.values(S.attacks).some(a=>!a.isolated);
- if(S.ready&&!live&&S.lastThreat&&Date.now()-S.lastThreat>9000&&(S.profile!=="nominal")&&!S.estop){S.cap=1;S.fusion={cam:.4,lidar:.4,odom:.2};S.profile="nominal";log("info","self-healing complete: nominal profile restored")}
+ if(S.ready&&!live&&S.lastThreat&&Date.now()-S.lastThreat>9000&&(S.profile!=="nominal")&&!S.estop){S.cap=1;S.fusion={cam:.4,lidar:.4,odom:.2};S.profile="nominal";log("info","self-healing complete: nominal profile restored");chainHeal()}
  S.series.score.push(S.score);S.series.cmd.push(S.cmdHz);S.series.cpu.push(v[3]);for(const k in S.series)if(S.series[k].length>60)S.series[k].shift();updateUI()}
-function updateUI(){$("#mScore").textContent=S.score.toFixed(2);$("#mScore").className=S.score>.5?"bad":"ok";$("#mCmd").textContent=Math.round(S.cmdHz);$("#mCap").textContent=S.cap.toFixed(1);
- const st=$("#mStop");st.textContent=S.estop?"ENGAGED":"RELEASED";st.className=S.estop?"bad pulse":"ok";const p=$("#mProf");p.textContent=S.profile;p.className=S.profile==="nominal"?"ok":"warn";
+function setState(){const threat=Object.values(S.attacks).some(a=>!a.isolated)||S.estop;document.body.dataset.state=!S.ready?"learning":threat?"threat":S.profile!=="nominal"?"degraded":"armed";
+ $("#pill").textContent={learning:"LEARNING BASELINE",armed:"● ARMED",threat:"▲ THREAT",degraded:"◐ DEGRADED"}[document.body.dataset.state]}
+function updateUI(){$("#mScore").textContent=S.score.toFixed(2);$("#ring").style.setProperty("--p",Math.round(S.score*100));$("#mCmd").textContent=Math.round(S.cmdHz);$("#mCap").textContent=S.cap.toFixed(1);
+ const st=$("#mStop");st.textContent=S.estop?"ENGAGED":"OFF";st.className=S.estop?"bad pulse":"ok";const p=$("#mProf");p.textContent=S.profile;p.className=S.profile==="nominal"?"ok":"warn";
  $("#mFus").textContent=[S.fusion.cam,S.fusion.lidar,S.fusion.odom].join("/").replace(/0\./g,".");
- const nb=$("#nodes");nb.textContent="";const hot=n=>Object.keys(S.attacks).some(k=>!S.attacks[k].isolated&&n===k);
- [["ros2-core","ok"],["vision","spoof"],["brain","ok"],["ids","ok"],["hsm","ok"]].forEach(([n,a])=>{const bad=a!=="ok"&&hot(a);nb.appendChild(el("span","node "+(bad?"warn":"ok"),n+(bad?" ⚠":"")))});
- if(S.revoked.length)nb.appendChild(el("span","node bad","attacker_rogue REVOKED"));if(S.attacks.rogue&&!S.attacks.rogue.isolated)nb.appendChild(el("span","node bad pulse","attacker_rogue ⚠ untrusted"));drawChart()}
-
+ const nb=$("#nodes");nb.textContent="";const hot=n=>S.attacks[n]&&!S.attacks[n].isolated;
+ [["ros2-core",""],["vision","spoof"],["brain",""],["ids",""],["hsm",""]].forEach(([n,a])=>{const bad=a&&hot(a);nb.appendChild(el("span","node "+(bad?"warn":"ok"),n+(bad?" ⚠":"")))});
+ if(S.revoked.length)nb.appendChild(el("span","node bad","attacker_rogue REVOKED"));if(hot("rogue"))nb.appendChild(el("span","node bad pulse","attacker_rogue ⚠"));
+ S.chain.forEach((v,i)=>{const e=$("#c"+i);e.classList.toggle("on",!!v)});setState();drawChart()}
+function incident(sev){S.chain=[1,0,0,0];updateUI();setTimeout(()=>{S.chain[1]=1;updateUI()},350);setTimeout(()=>{S.chain[2]=1;updateUI()},800);
+ document.body.classList.add("alarm");setTimeout(()=>document.body.classList.remove("alarm"),1400);
+ if(sev==="critical"&&typeof navigator!=="undefined"&&navigator.vibrate){try{navigator.vibrate([120,60,120])}catch(e){}}}
+function chainHeal(){S.chain[3]=1;updateUI();setTimeout(()=>{S.chain=[0,0,0,0];updateUI()},4000)}
 /* ============================== mission planner (JS port of agentic_brain.plan_mission) ============================== */
 function planMission(text){const t=text.toLowerCase(),sm=t.match(/(\d+(?:\.\d+)?)\s*m\/s/),speed=Math.min(sm?+sm[1]:.5,1);let x=S.robot.x,y=S.robot.y;const wps=[];
  const DIRS={north:[0,-1],south:[0,1],east:[1,0],west:[-1,0],forward:[1,0],back:[-1,0]};
@@ -341,8 +382,9 @@ async function send(text){text=(text||$("#chatIn").value).trim();if(!text)return
 async function loadModels(){if(!key())return;try{const r=await fetch(GROQ+"/models",{headers:{Authorization:"Bearer "+key()}});if(!r.ok)return;const ids=(await r.json()).data.map(m=>m.id).filter(i=>!/whisper|tts|guard|embed|playai|orpheus/i.test(i)).sort();if(!ids.length)return;const sel=$("#model"),cur=localStorage.getItem("nexus_groq_model")||"llama-3.3-70b-versatile";sel.textContent="";ids.forEach(i=>{const o=el("option","",i);o.value=i;sel.appendChild(o)});sel.value=ids.includes(cur)?cur:ids[0]}catch(e){}}
 
 /* ============================== wiring ============================== */
+document.querySelectorAll(".dock button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".dock button").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id==="p-"+b.dataset.tab))});
 document.querySelectorAll(".atk").forEach(b=>b.onclick=()=>startAttack(b.dataset.a));
-$("#release").onclick=()=>{S.estop=false;log("info","operator released e-stop");updateUI()};
+$("#release").onclick=()=>{if(S.estop){S.estop=false;log("info","operator released e-stop");chainHeal()}};
 $("#estopBtn").onclick=()=>engage("operator");
 $("#planBtn").onclick=()=>{const r=planMission($("#mission").value);log("info",r.ok?"mission planned: "+r.waypoints+" waypoints @ "+r.speed+" m/s":"mission parse failed: "+r.error)};
 $("#send").onclick=()=>send();$("#chatIn").addEventListener("keydown",e=>{if(e.key==="Enter")send()});
@@ -353,11 +395,15 @@ $("#model").onchange=e=>localStorage.setItem("nexus_groq_model",e.target.value);
 ["Status","Run DoS attack","Run rogue attack","Explain last threat","Go to (25,4) then north 6 m"].forEach(q=>{const b=el("button","btn",q);b.style.fontSize="11px";b.onclick=()=>send(q);$("#quick").appendChild(b)});
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 if(SR){const rec=new SR();rec.lang="en-US";rec.onresult=e=>send(e.results[0][0].transcript);$("#mic").onclick=()=>{try{rec.start()}catch(e){}}}else $("#mic").style.display="none";
-addMsg("a","NEXUS-AI online. Try: \"run a DoS attack\", \"status\", \"explain the last threat\" or \"go to (25,4) then north 6 m\". Add a free Groq key on the right for full agentic reasoning.");
+addMsg("a","NEXUS-AI online. Try: \"run a DoS attack\", \"status\", \"explain the last threat\" or \"go to (25,4) then north 6 m\". Add a free Groq key (Connect section below) for full agentic reasoning.");
 if(key()){loadModels();$("#aiMode").textContent="mode: groq (key found)"}
 renderHits();
-let last=performance.now();function frame(t){const dt=Math.min((t-last)/1000,.1)*TS;last=t;physics(dt);drawMap();requestAnimationFrame(frame)}
-requestAnimationFrame(frame);setInterval(()=>{idsTick().catch(console.error)},1000);addEventListener("resize",()=>{drawMap();drawChart()});
+/* boot sequence */
+(function boot(){const lines=["> SROS2 enclave .......... ENFORCE","> HSM vault ............ UNSEALED","> PQC hybrid ........... Ed25519 + Dilithium3","> eBPF guardian ........ ATTACHED","> IDS baseline ......... LEARNING","> NEXUS-AI ............. ONLINE","","ACCESS GRANTED"];const b=$("#boot"),o=$("#bootlog");
+ if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches){b.classList.add("gone");return}
+ let i=0;const t=setInterval(()=>{if(i<lines.length)o.textContent+=lines[i++]+"\n";else{clearInterval(t);setTimeout(()=>b.classList.add("gone"),450)}},170)})();
+let last=performance.now();function frame(t){const dt=Math.min((t-last)/1000,.1)*TS;last=t;physics(dt);drawMap(t);requestAnimationFrame(frame)}
+requestAnimationFrame(frame);setInterval(()=>{idsTick().catch(console.error)},1000);addEventListener("resize",()=>{drawChart()});
 log("info","digital twin online; IDS learning clean baseline (12 s)");updateUI();
 </script>
 </body>
