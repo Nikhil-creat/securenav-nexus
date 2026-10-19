@@ -22,7 +22,7 @@ jobs:
         run: pytest -q
       - name: SBOM (CycloneDX)
         run: pip install cyclonedx-bom==4.4.3 && cyclonedx-py requirements requirements/base.txt -o sbom.json || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: sbom, path: sbom.json, if-no-files-found: ignore }
   ros2-integration:
